@@ -1,0 +1,239 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>CLIP | Evanescence's Blog</title><meta name="author" content="Henry"><meta name="copyright" content="Henry"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="ffffff"><meta name="description" content="CLIP将计算机视觉与自然语言处理相结合，获得更加优秀的迁移性能与zero-shot效果。同时打破了固定标签的定式。 Abstract针对目前已有的计算机视觉系统，大部分都是使用固定的标签集合，这限制了它的泛化性能和可用性。于是作者选择通过图片的语言文本来进行图像识别。作者爬取了4亿张图片以进行模型的预训练。在预训练完成后，作者在30多个任务上进行了测试。在ImageNet数据集内，CLIP模型在">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CLIP">
+<meta property="og:url" content="http://evanescence0515.github.io/2025/05/08/CLIP/index.html">
+<meta property="og:site_name" content="Evanescence&#39;s Blog">
+<meta property="og:description" content="CLIP将计算机视觉与自然语言处理相结合，获得更加优秀的迁移性能与zero-shot效果。同时打破了固定标签的定式。 Abstract针对目前已有的计算机视觉系统，大部分都是使用固定的标签集合，这限制了它的泛化性能和可用性。于是作者选择通过图片的语言文本来进行图像识别。作者爬取了4亿张图片以进行模型的预训练。在预训练完成后，作者在30多个任务上进行了测试。在ImageNet数据集内，CLIP模型在">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://evanescence0515.github.io/img/deeplearning_pic.png">
+<meta property="article:published_time" content="2025-05-08T11:16:23.000Z">
+<meta property="article:modified_time" content="2025-05-08T11:16:23.000Z">
+<meta property="article:author" content="Henry">
+<meta property="article:tag" content="深度学习">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://evanescence0515.github.io/img/deeplearning_pic.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "CLIP",
+  "url": "http://evanescence0515.github.io/2025/05/08/CLIP/",
+  "image": "http://evanescence0515.github.io/img/deeplearning_pic.png",
+  "datePublished": "2025-05-08T11:16:23.000Z",
+  "dateModified": "2025-05-08T11:16:23.000Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Henry",
+      "url": "http://evanescence0515.github.io/"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://evanescence0515.github.io/2025/05/08/CLIP/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', 'ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'CLIP',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg" style="background-color: #EEEEEE;"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/my_icon.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">9</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">3</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">3</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> List</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/tools/"><i class="fa-fw fas fa-tools"></i><span> Tools</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(img/deeplearning_pic.png);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Evanescence's Blog</span></a><a class="nav-page-title" href="/"><span class="site-name">CLIP</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> List</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/tools/"><i class="fa-fw fas fa-tools"></i><span> Tools</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">CLIP</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-05-08T11:16:23.000Z" title="发表于 2025-05-08 19:16:23">2025-05-08</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-05-08T11:16:23.000Z" title="更新于 2025-05-08 19:16:23">2025-05-08</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><p>CLIP将计算机视觉与自然语言处理相结合，获得更加优秀的迁移性能与zero-shot效果。同时打破了固定标签的定式。</p>
+<h1 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h1><p>针对目前已有的计算机视觉系统，大部分都是使用固定的标签集合，这限制了它的泛化性能和可用性。<br>于是作者选择通过图片的语言文本来进行图像识别。作者爬取了4亿张图片以进行模型的预训练。在预训练完成后，作者在30多个任务上进行了测试。<br>在ImageNet数据集内，CLIP模型在zero-shot的情况下便已经与训练完成的Resnet50打成平手。</p>
+<h1 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h1><p>GPT作为一个”Text-in-text-out”的经典案例，反映了弱监督工作的可行性，于是作者决定提出使用图片与文字结合，进行CLIP模型的研究。<br>已有相关研究VirTex, ICMLM和ConVIRT方法虽然接近，但是数据集规模较少，而有些弱监督模型的准确率较高，其依赖的是极度大量数据集，所以作者考虑到是否能够同时满足以上条件，进而研究出新的方法。在预实验结果中，使用已有模型(ConVIRT)与新的数据，其模型在zero-shot上成功体现出极好的效果。同时<strong>模型效果与模型大小呈现正相关</strong>。</p>
+<h1 id="Method"><a href="#Method" class="headerlink" title="Method"></a>Method</h1><h2 id="Dataset"><a href="#Dataset" class="headerlink" title="Dataset"></a>Dataset</h2><p>作者发现目前已有数据集不能满足训练需求，所以选择自己开发数据集。</p>
+<h2 id="Pre-Training-Method"><a href="#Pre-Training-Method" class="headerlink" title="Pre-Training Method"></a>Pre-Training Method</h2><p>作者针对该数据的标签，决定使用“图像-文本配对”的方法来进行训练，这是因为如果采用标签生成或者词袋模型，训练过程较慢。<br>同时作者也采用对比学习的方法进行训练。<br>作者在训练过程中其实是发现了两个重要的事情。</p>
+<h3 id="非线性映射"><a href="#非线性映射" class="headerlink" title="非线性映射"></a>非线性映射</h3><p>CLIP（Contrastive Language–Image Pre-training）在其两个编码器（图像编码器与文本编码器）末端各插入了一个 <strong>线性映射</strong>（linear projection）层，将各自的表示向量映射到同一多模态嵌入空间，以便计算余弦相似度并进行对比损失优化。在早期的对比或自监督学习框架（如 SimCLR、MoCo 等）中，人们常使用 <strong>非线性映射头</strong>（two-layer MLP + ReLU + BN）来获得更好的特征表示；而 CLIP 的作者发现，去掉这层非线性映射，仅保留简单的线性映射，训练效率与效果几乎无差异，因此选择了更为简洁的设计。</p>
+<h3 id="未出现过拟合"><a href="#未出现过拟合" class="headerlink" title="未出现过拟合"></a>未出现过拟合</h3><p>作者在训练过程中未出现过拟合。<em>其实挺好理解的，这么大的数据集能过拟合也是神人了</em><br>作者对于数据的处理也仅仅只有裁剪，而并未采用更多的高级方法。作者对于温度系数 $t$ 也仅仅只是进行</p>
+<h2 id="Choosing-and-Scaling-the-Model"><a href="#Choosing-and-Scaling-the-Model" class="headerlink" title="Choosing and Scaling the Model"></a>Choosing and Scaling the Model</h2><h3 id="伪代码"><a href="#伪代码" class="headerlink" title="伪代码"></a>伪代码</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">image_encoder: Resnet or Vision Transformer</span><br><span class="line">text_encoder: CBOW or Text Transformer</span><br><span class="line">I: n * h * w * c, minibatch of aligned images</span><br><span class="line">T: n * l, minibatch of aligned texts</span><br><span class="line">t: learned temperature parameter</span><br><span class="line"></span><br><span class="line"># extract feature representations of each modality</span><br><span class="line">I_f = image_encoder(I) #[n, d_i]</span><br><span class="line">T_f = text_encoder(T) #[n, d_t]</span><br><span class="line"></span><br><span class="line"># joint multimodal embedding [n, d_e]</span><br><span class="line"># linear projectin</span><br><span class="line"># 这里是多模态常见的合成方法</span><br><span class="line">I_e = l2_normalize(np.dot(I_f, W_i), axis = 1)</span><br><span class="line">T_e = l2_normalize(np.dot(T_f, W_t), axis = 1)</span><br><span class="line"></span><br><span class="line"># scaled pairwise cosine similarities</span><br><span class="line">logits = np.dot(I_e, T_e.T) * np.exp(t)</span><br><span class="line"></span><br><span class="line"># symmetric loss function</span><br><span class="line"># 这里的正样本是对角线上的数据，也就是第一排第一个，第二排第二个。这里对比学习的思路。</span><br><span class="line">labels  = np.arrang(n)</span><br><span class="line">loss_i = cross_entropy_loss(logits, labels, aixs = 0)</span><br><span class="line">loss_t = cross_entropy_loss(logits, labels, aixs = 1)</span><br><span class="line">loss = (loss_i + loss_t)/2</span><br></pre></td></tr></table></figure>
+<h2 id="Training"><a href="#Training" class="headerlink" title="Training"></a>Training</h2><p>作者训练了5个ResNets和3个Vision Transformers<br>ResNet: ResNet-50, ResNet-101, EfficientNet-style model 4x, 16x and 64x the compute of a ResNet-50<br>Vision Transformer: ViT-B&#x2F;32 Vit-B&#x2F;16 ViT-L&#x2F;14<br>训练32个epoch，Adam优化器<br>作者对于ViT-L&#x2F;14在336像素的图片上又额外训练了一个epoch，并将其标注为ViT-L&#x2F;14@336px. 后面使用的模型均为ViT-L&#x2F;14@336px</p>
+<h1 id="Experiments"><a href="#Experiments" class="headerlink" title="Experiments"></a>Experiments</h1><h3 id="Inference"><a href="#Inference" class="headerlink" title="Inference"></a>Inference</h3><p><img src="/2025/05/08/CLIP/CLIP_inference.png" alt="CLIP_inference" title="CLIP_inference"></p>
+<ol>
+<li>通过Prompt Engineering构造选项(备选方案如plane, car, dog -&gt; A photo of plane, car, dog)经过Text Encoder计算为向量。</li>
+<li>将图片经过Encoder转化为图像，计算图像与词向量的余弦相似度</li>
+</ol>
+<h3 id="Prompt-Engineering-and-Ensembling"><a href="#Prompt-Engineering-and-Ensembling" class="headerlink" title="Prompt Engineering and Ensembling"></a>Prompt Engineering and Ensembling</h3><p>作者在该段提出了：多义性(polysemy)和标签多为短句的问题。并对于这两种问题，其提出使用提示词模板来解决，例如模板”A photo of a {label}”. 该方法提升准确率1.3%<br>同时，对于特定数据集，可以将模型进一步扩充，如对于Oxford-IIIT Pets, 则可将模板改为”A photo of a {label}, a type of pets”.</p>
+<h3 id="效果分析"><a href="#效果分析" class="headerlink" title="效果分析"></a>效果分析</h3><ol>
+<li>CLIP(zero-shot) vs linear probe Resnet50: 对于有具体物体的模型CLIP表现更佳，而抽象概念的数据则相对较差(如数字、纹理)。</li>
+<li>CLIP vs previous few-shot method: 远超既往小样本学习结果。CLIP在zero-shot的情况下，准确率已经和BiT-M的16-shot的效果相近。但是在部分few-shot上CLIP反而不如自己的zero-shot。</li>
+<li>CLIP使用linear probe效果，全数据集训练效果依旧强劲。</li>
+</ol>
+<h1 id="Comparison-to-Human-Performance"><a href="#Comparison-to-Human-Performance" class="headerlink" title="Comparison to Human Performance"></a>Comparison to Human Performance</h1><p><img src="/2025/05/08/CLIP/Comparison_to_human.png" alt="Comparison_to_human" title="Comparison_to_human"></p>
+<h1 id="Limitation"><a href="#Limitation" class="headerlink" title="Limitation"></a>Limitation</h1><ol>
+<li>距离已有模型的SOTA有较大距离，只是优于ResNet50的Baseline.</li>
+<li>CLIP对于部分数据的效果不佳，比如细分类的数据集、抽象概念的数据(数字、异常提取)。</li>
+<li>对于数据分布偏差极大的数据集，效果依旧较差。例如MNIST数据集效果较差，作者分析是因为400M图片中均无MNIST类似的图片。</li>
+<li>CLIP不是生成式模型，仍然需要提供一些选项。</li>
+<li>CLIP模型对于数据的应用并不高效。</li>
+<li>希望能够产生一种新的，针对Zero-shot的数据集。</li>
+<li>数据并无清洗，可能存在偏见。</li>
+<li>CLIP在few-shot的情况下并不如zero-shot优秀。</li>
+</ol>
+<hr>
+
+<p>Cover image icon by <a target="_blank" rel="noopener" href="https://www.flaticon.com/authors/becris" title="Becris">Becris</a> from <a target="_blank" rel="noopener" href="https://www.flaticon.com/free-icons/deep-learning" title="deep learning icons">Flaticon</a></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://evanescence0515.github.io">Henry</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://evanescence0515.github.io/2025/05/08/CLIP/">http://evanescence0515.github.io/2025/05/08/CLIP/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="http://evanescence0515.github.io" target="_blank">Evanescence's Blog</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a></div><div class="post-share"><div class="social-share" data-image="/img/deeplearning_pic.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related full-width" href="/2025/05/06/Propensity-Score/" title="Propensity Score"><img class="cover" src="/img/inference_pic.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">Propensity Score</div></div><div class="info-2"><div class="info-item-1">The propensity score makes it so that you don’t have to condition on the entirety of X to achieve independence of the potential outcomes on the treatment. It is sufficient to condition on this single variable, which is the propensity score$$(Y_{0},Y_{1}) \perp T|e(x)$$The propensity score is the conditional probability of receiving the treatment, right? So we can think of it as some sort of function that converts X into the treatment T. The propensity score makes this middle ground between...</div></div></div></a></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/my_icon.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Henry</div><div class="author-info-description">至此鲜花赠自己，纵马踏花向自由</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">9</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">3</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">3</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/evanescence0515"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/evanescence0515" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:evanescence0515@gmail.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">你好呀，这里是Evanescence的博客，  我会经常分享一些学习统计学、生物信息学、机器学习和计算机技术的心得和笔记。</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Abstract"><span class="toc-number">1.</span> <span class="toc-text">Abstract</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Introduction"><span class="toc-number">2.</span> <span class="toc-text">Introduction</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Method"><span class="toc-number">3.</span> <span class="toc-text">Method</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Dataset"><span class="toc-number">3.1.</span> <span class="toc-text">Dataset</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Pre-Training-Method"><span class="toc-number">3.2.</span> <span class="toc-text">Pre-Training Method</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%9D%9E%E7%BA%BF%E6%80%A7%E6%98%A0%E5%B0%84"><span class="toc-number">3.2.1.</span> <span class="toc-text">非线性映射</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9C%AA%E5%87%BA%E7%8E%B0%E8%BF%87%E6%8B%9F%E5%90%88"><span class="toc-number">3.2.2.</span> <span class="toc-text">未出现过拟合</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Choosing-and-Scaling-the-Model"><span class="toc-number">3.3.</span> <span class="toc-text">Choosing and Scaling the Model</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BC%AA%E4%BB%A3%E7%A0%81"><span class="toc-number">3.3.1.</span> <span class="toc-text">伪代码</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Training"><span class="toc-number">3.4.</span> <span class="toc-text">Training</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Experiments"><span class="toc-number">4.</span> <span class="toc-text">Experiments</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Inference"><span class="toc-number">4.0.1.</span> <span class="toc-text">Inference</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Prompt-Engineering-and-Ensembling"><span class="toc-number">4.0.2.</span> <span class="toc-text">Prompt Engineering and Ensembling</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%95%88%E6%9E%9C%E5%88%86%E6%9E%90"><span class="toc-number">4.0.3.</span> <span class="toc-text">效果分析</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Comparison-to-Human-Performance"><span class="toc-number">5.</span> <span class="toc-text">Comparison to Human Performance</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Limitation"><span class="toc-number">6.</span> <span class="toc-text">Limitation</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2025/05/08/CLIP/" title="CLIP"><img src="/img/deeplearning_pic.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="CLIP"/></a><div class="content"><a class="title" href="/2025/05/08/CLIP/" title="CLIP">CLIP</a><time datetime="2025-05-08T11:16:23.000Z" title="发表于 2025-05-08 19:16:23">2025-05-08</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/05/06/Propensity-Score/" title="Propensity Score"><img src="/img/inference_pic.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Propensity Score"/></a><div class="content"><a class="title" href="/2025/05/06/Propensity-Score/" title="Propensity Score">Propensity Score</a><time datetime="2025-05-06T12:38:20.000Z" title="发表于 2025-05-06 20:38:20">2025-05-06</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/05/06/Stats-Review/" title="Stats Review"><img src="/img/inference_pic.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Stats Review"/></a><div class="content"><a class="title" href="/2025/05/06/Stats-Review/" title="Stats Review">Stats Review</a><time datetime="2025-05-06T12:28:49.000Z" title="发表于 2025-05-06 20:28:49">2025-05-06</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/05/06/Beyond-Confounders/" title="Beyond Confounders"><img src="/img/inference_pic.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Beyond Confounders"/></a><div class="content"><a class="title" href="/2025/05/06/Beyond-Confounders/" title="Beyond Confounders">Beyond Confounders</a><time datetime="2025-05-06T12:17:58.000Z" title="发表于 2025-05-06 20:17:58">2025-05-06</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/05/06/%E5%BE%AA%E8%AF%81%E5%8C%BB%E5%AD%A67-8%E5%91%A8%E5%9B%9E%E9%A1%BE/" title="循证医学7-8周回顾"><img src="/img/epidemic_pic.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="循证医学7-8周回顾"/></a><div class="content"><a class="title" href="/2025/05/06/%E5%BE%AA%E8%AF%81%E5%8C%BB%E5%AD%A67-8%E5%91%A8%E5%9B%9E%E9%A1%BE/" title="循证医学7-8周回顾">循证医学7-8周回顾</a><time datetime="2025-05-06T07:24:17.000Z" title="发表于 2025-05-06 15:24:17">2025-05-06</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2019 - 2025 By Henry</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.3.5</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"><script>(() => {
+  const loadMathjax = () => {
+    if (!window.MathJax) {
+      window.MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']],
+          tags: 'none',
+        },
+        chtml: {
+          scale: 1.1
+        },
+        options: {
+          enableMenu: true,
+          renderActions: {
+            findScript: [10, doc => {
+              for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+                const display = !!node.type.match(/; *mode=display/)
+                const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display)
+                const text = document.createTextNode('')
+                node.parentNode.replaceChild(text, node)
+                math.start = {node: text, delim: '', n: 0}
+                math.end = {node: text, delim: '', n: 0}
+                doc.math.push(math)
+              }
+            }, '']
+          }
+        }
+      }
+
+      const script = document.createElement('script')
+      script.src = 'https://cdn.jsdelivr.net/npm/mathjax/es5/tex-mml-chtml.min.js'
+      script.id = 'MathJax-script'
+      script.async = true
+      document.head.appendChild(script)
+    } else {
+      MathJax.startup.document.state(0)
+      MathJax.texReset()
+      MathJax.typesetPromise()
+    }
+  }
+
+  btf.addGlobalFn('encrypt', loadMathjax, 'mathjax')
+  window.pjax ? loadMathjax() : window.addEventListener('load', loadMathjax)
+})()</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
