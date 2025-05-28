@@ -1,0 +1,224 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>表格数据学习方法综述阅读(上) | Evanescence's Blog</title><meta name="author" content="Henry"><meta name="copyright" content="Henry"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="ffffff"><meta name="description" content="表格数据(tabular data)是日常生活中最常见的数据格式，为了挖掘表格数据中的有效信息，提出了很多相关的算法。这篇综述概括了表格数据的机器学习与深度学习方法，原文来自于南京大学LAMDA实验室中的LAMDA-tabular课题组，文章地址。 1-3对于tabular data的一些简单介绍，略过 4 特定方法的分类作者将模型分为三类：特化方法(specialized methods), 迁">
+<meta property="og:type" content="article">
+<meta property="og:title" content="表格数据学习方法综述阅读(上)">
+<meta property="og:url" content="http://evanescence0515.github.io/2025/05/28/Tabular-Review-1/index.html">
+<meta property="og:site_name" content="Evanescence&#39;s Blog">
+<meta property="og:description" content="表格数据(tabular data)是日常生活中最常见的数据格式，为了挖掘表格数据中的有效信息，提出了很多相关的算法。这篇综述概括了表格数据的机器学习与深度学习方法，原文来自于南京大学LAMDA实验室中的LAMDA-tabular课题组，文章地址。 1-3对于tabular data的一些简单介绍，略过 4 特定方法的分类作者将模型分为三类：特化方法(specialized methods), 迁">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://evanescence0515.github.io/img/deeplearning_pic.png">
+<meta property="article:published_time" content="2025-05-28T09:05:48.000Z">
+<meta property="article:modified_time" content="2025-05-28T09:05:48.000Z">
+<meta property="article:author" content="Henry">
+<meta property="article:tag" content="深度学习">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://evanescence0515.github.io/img/deeplearning_pic.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "表格数据学习方法综述阅读(上)",
+  "url": "http://evanescence0515.github.io/2025/05/28/Tabular-Review-1/",
+  "image": "http://evanescence0515.github.io/img/deeplearning_pic.png",
+  "datePublished": "2025-05-28T09:05:48.000Z",
+  "dateModified": "2025-05-28T09:05:48.000Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Henry",
+      "url": "http://evanescence0515.github.io/"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://evanescence0515.github.io/2025/05/28/Tabular-Review-1/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', 'ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"未找到符合您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '表格数据学习方法综述阅读(上)',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg" style="background-color: #EEEEEE;"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/my_icon.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">13</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">3</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">3</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> List</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/tools/"><i class="fa-fw fas fa-tools"></i><span> Tools</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(img/deeplearning_pic.png);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Evanescence's Blog</span></a><a class="nav-page-title" href="/"><span class="site-name">表格数据学习方法综述阅读(上)</span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> Search</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> List</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/tools/"><i class="fa-fw fas fa-tools"></i><span> Tools</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">表格数据学习方法综述阅读(上)</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-05-28T09:05:48.000Z" title="发表于 2025-05-28 17:05:48">2025-05-28</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-05-28T09:05:48.000Z" title="更新于 2025-05-28 17:05:48">2025-05-28</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><p>表格数据(tabular data)是日常生活中最常见的数据格式，为了挖掘表格数据中的有效信息，提出了很多相关的算法。这篇综述概括了表格数据的机器学习与深度学习方法，原文来自于南京大学LAMDA实验室中的<a target="_blank" rel="noopener" href="https://github.com/LAMDA-Tabular">LAMDA-tabular课题组</a>，<a target="_blank" rel="noopener" href="https://arxiv.org/abs/2504.16109">文章地址</a>。</p>
+<h1 id="1-3"><a href="#1-3" class="headerlink" title="1-3"></a>1-3</h1><p>对于tabular data的一些简单介绍，略过</p>
+<h1 id="4-特定方法的分类"><a href="#4-特定方法的分类" class="headerlink" title="4 特定方法的分类"></a>4 特定方法的分类</h1><p>作者将模型分为三类：特化方法(specialized methods), 迁移方法(transferable methods), 广义方法(general methods)。</p>
+<h2 id="Specialized-method"><a href="#Specialized-method" class="headerlink" title="Specialized method"></a>Specialized method</h2><p>作者从3个角度入手讲述特化模型的方法：<br>Feature Aspect：特征角度来看，模型主要针对数据特征的关系进行建模。<br>Sample Aspect：从样本特征来看，模型通过最大化每个样本最邻近样本的作用来预测。<br>Objective Aspect：从客观角度，修改损失函数和整体目标(Overall objective)来引导模型特定的模式与偏好，注入inductive  bias(推断偏倚)。</p>
+<h3 id="Feature-Aspect"><a href="#Feature-Aspect" class="headerlink" title="Feature Aspect"></a>Feature Aspect</h3><p>特征角度来看，模型主要针对数据特征的关系进行建模。<br>传统特征工程主要依赖于人手工设计特征，随着深度学习的进展，诸多特征相关的模型出现，例如特诊编码、选择、投影和交互。</p>
+<h4 id="Feature-Encoding"><a href="#Feature-Encoding" class="headerlink" title="Feature Encoding"></a>Feature Encoding</h4><p>注意力机制让我们可以像自然语言处理中的词嵌入一样对于特征进行tokenization，将所有特征转变为嵌入。<br><strong>Categorical Encoding</strong><br>最主要使用的两种策略是序列编码(Ordinal Encoding)和独热编码(One-hot Encoding)。更加先进的编码方式还有Target Encoding，通过将该类的结局变量(target)的均值赋为该类的编码。该方法主要用于该变量与结局有很强的相关性。在留一法(Leave-one-out embedding)中，每个类都被赋予除了该变量的其他的结局均值。<br><strong>Numerical Encoding</strong><br><em>MLP-PLR</em>引入了2种数值编码方式：Piecewise Linear Encoding(PLE：分段线性编码) 和 Periodic Activation Function(周期性激活函数)。这两种方法可以与其他分类方法结合来提高表现。PLE基于特征分箱，为原始标量值生成了替代的初始表示。周期性激活函数考虑到：嵌入框架都是将所有特征独立处理，这让结合变量在嵌入过程中变得不可能。因此，周期激活函数会训练激活前的系数，而不仅仅是固定不变。<br><strong>Feature Tokenization</strong><br>它将特征转为embedding，因为特征表示是非常稀疏的，常用的方法就是将其转化为低维度表示(这里主要是将图片转为图特征向量)。<br>广义的特征tokenization可以被表示如下：<br>$$T_{i,j}&#x3D;b_{j}+\tau(x_{i,j};\Psi)\in \mathbb{R}^t$$<br>其中,$\tau(\cdot)$是特征分词器模块，将输入$x_{i} \in \mathbb{R}^d$转为嵌入$T_{i,j} \in \mathbb{R}^t$，$b_{j}$是第j个特征的偏倚，$\Psi$是可学习参数。<br><em>AutoInt</em>将分类变量和数值变量同时编码为低维度的变量。<em>TabTransformer</em>将每个分类变量手机用Column Embedding嵌入一个t维度的参数嵌入中。<em>SAINT</em>在传入 transformer编码器前，先将数值变量映射到一个t维的空间内。<em>FT-Transformer</em>使用了transformer架构。其中，数值变量使用了逐元素加法$T_{i}^{num}&#x3D;b_{i}^{num} + x_{i}^{num}W_{i}^{num}$；分类变量则使用了查表法$T_{i}^{cat} &#x3D; b_{i}^{cat} + e_{i}^TW_{i}^{cat}$，其中$e_{i}^T$是对应类的独热向量。</p>
+<h4 id="Feature-Selection"><a href="#Feature-Selection" class="headerlink" title="Feature Selection"></a>Feature Selection</h4><p>高维度的数据常常会带来过拟合，模型过度关注无关的特征从而忽视了更加重要的特征，特征选择留下了最重要的特征避免过拟合。<br>传统树学习使用自动的特征选择来评估每个特征与结局之间的关联。决策树使用了基尼系数或者信息增益；随机森林使用了计算每个特征贡献度的方法；最近现代学习方法经常模拟树结构的方法来进行特征选取。<br><em>GrowNet</em>和<em>NODE</em>主要模仿了集成学习的方法，受GBDT启发，GrowNet设计了使用多个DNN构建多个弱学习器，每个学习器输入初始变量和前一层的输出；NODE使用可导遗忘决策树(Differentiable Oblivious Decision Tree)作为基学习器，在每层使用bagging和每个多层结构间使用stacking；为了让GAM(广义加性模型)可量化且高效，NODE-GAM将NODE改为GAM并允许GAM学习快速、非线性的跳跃以适应真实数据。<br><em>TabNET</em>和<em>GRANDE</em>更加关注树模型如何处理特征。TabNET不仅仅通过自监督学习保留了深度神经网络的表征学习能力，同时还融合了树模型的可解释性和稀疏特征选取能力；GRANDE认为树模型中的硬分裂(hard splits：某个特征的值满足条件就完全走一条路径)是深度模型的关键优势，并由此提出了一种利用梯度下降来学习硬、轴对称(axis-aligned：仅基于一个特征分裂，对立的是oblique split，需要结合多个特征进行分裂)的树集成模型，将轴对称分裂带来的有效归纳偏差与梯度下降优化带来的灵活性结合。</p>
+<h4 id="Feature-Projection"><a href="#Feature-Projection" class="headerlink" title="Feature Projection"></a>Feature Projection</h4><p>特征映射旨在将特征转为中间形式，加强表达能力。特征映射可被分为两类：MLP变体和专门设计的架构。这些方法旨在加强模型对于复杂特征的表达能力：<br><strong>MLP Variant</strong>：<em>RTDL</em>研究了类似Resnet和基于transformer架构的模型，提出了简单但是有效的调整，尤其是MLP架构，其使用了多个包含线性层、ReLU激活函数和Dropout的块的堆叠，这将原始特征转为了固定维度的潜在表征，最终一个线性层作为分类头。这篇文章强调：如果有合理的超参数，简单的MLP和ResNet也能达到benchmarks。<br>另外一个同期的研究通过给MLP装备了一组正则化现代套件。通过多种正则方法的堆叠，形成了一种正则化鸡尾酒的方法。这个研究揭示了两种重要发现：1) 原版MLP(vanilla MLP: 有趣的是vanilla有”香草”的意思)通过正则化可以超过许多为面板数据设计的特化的、现代的神经网络架构；2) 这样的MLP甚至可以超过XGBoost。<em>RealMLP</em>探索了包括预处理、超参数调参、架构、正则化和初始化的多个角度。<br><strong>Special Designed Architectures</strong>：对于单元，受到归一化方法容易导致干扰，<em>SNN</em>提出了SELU(Scaled Exponential Linear Unit)；<em>NAMs</em>使用ExU(exp-centered hidden units)来提升对于跳跃函数(jumpy function)的学习能力；<em>BiSHop</em>使用双组分方法(dual-component approach：指的是一种将<strong>两个主要部分、机制或因素</strong>结合起来解决问题、建模、分析的策略。它体现的是“<strong>两个互补或协同的部分</strong>共同作用”。)使用两个有方向性、彼此连接的学习模块按顺序评估数据的行和列，他使用了现代Hopfield层</p>
+<h4 id="Feature-Interaction"><a href="#Feature-Interaction" class="headerlink" title="Feature Interaction"></a>Feature Interaction</h4><p>广义形式可以表示为:<br>$$\hat{y_{i}} &#x3D; f(\mathcal{H}(x_{i}; \Theta))$$<br>其中$x_{i} \in \mathbb{R}^d$是输入向量，$\mathcal{H}(\cdot)$为特征交互模块，提取输入的特征依赖性并产生高维度的特征交互项；$f(\cdot)$是预测头。<br>特征交互可以被广泛的分为两类：自动交互模块的设计和潜在交互的挖掘。这些方法旨在加强模型学习复杂交互项和潜在特征结构的能力。<br><strong>Automatic Feature Interaction Modules</strong>：这些方法并不假设特定的特征类型，相仿，其关注提高模型中特征交互过程，让模型可以学到复杂且高维度的特征相关性。<em>DCNv2</em>通过Cross Network架构，它使用低秩方法(low-rank methods: 将高维度的参数矩阵$W \in \mathbb{R}^{d\times d}$化为两个低维度的矩阵$U,V \in \mathbb{R}^{d\times r}, W &#x3D; UV^\mathbf{T}$，以避免过拟合，非常有趣的方法，如果看过transformer的架构就会发现: <em>transformer在embedding的过程中input embedding和output embedding共用矩阵，这其实也是一种降低过拟合的方法</em>)在子空间中近似特征交叉(feature crosses:指的是将多个原始特征组合起来，比如将“性别 + 年龄”合成一个组合特征)，然后通过门控机制将这些子空间融合.<em>AutoInt</em>将原始稀疏的高维度特征向量(例如one-hot之后的类别)转为低维度空间并通过注意力机制将交互层堆叠(就是对于每个样本进行注意力操作)；不像AutoInt，<em>TabTransformer</em>只将类别变量嵌入内容嵌入，数值特征直接与交互后的上下文嵌入向量进行拼接。当只有数值变量时，其表现得像MLP，只有分类变量时，其表现得像AutoInt.<br><em>DANets</em>提出了表格数据中潜在特征组的存在，在每个特征组内的特征是相互之间相关的。它学习将特征分组并进行进一步的特征抽象；<em>SwitchTab</em>提出了一种思想：在表格特征中提取样本特异性的显著特征和样本共享的互信息(Mutual Information)；<em>ExcelFormer</em>认为DNN为每个特征赋予了一个权重，这会让模型纳入无关变量，为了解决这个问题，它引入了用于特征交互的“半透性注意力”(Semi-Permeable Attention)，这样可以让有较少信息的特征从有更多信息的模型中获取信息，同时避免高信息特征受到低信息特征的干扰。<em>AMFormer</em>提出了一种假说：算数特征交互项对于深度表格模型是重要的，基于Transformer架构，它提出了为了提取加性和乘性交互项的组件。</p>
+<h3 id="Sample-Aspect"><a href="#Sample-Aspect" class="headerlink" title="Sample Aspect"></a>Sample Aspect</h3><p>从样本特征来看，模型通过最大化每个样本最邻近样本的作用来预测。<br>广义的模型公式可以表示如下：<br>$$<br>\hat{y_{i}}&#x3D;f(\mathcal{R}(x_{i}, \mathcal{D}; \Phi))<br>$$<br>其中，$\mathcal{D}$为所有样本的集合，$\mathcal{R}(\cdot)$是样本交互模块。$\Phi$是$\mathcal{R}$的可学习参数。$f(\cdot)$是预测头，用于将特征转为最终的输出。<br>样本角度可以被简单分为两个主要策略，第一个策略通过representation training(表征学习)学习样本特征之间的关系；第二个策略使用“基于检索的模型”(Retrieval-based model)通过如何检索并使用临近样本的作用。<br><strong>Sample Interaction</strong>：这个方法通过在表征学习过程中，使用样本间的相关性来训练得到一个更加鲁棒的表征。在训练过程中，因为没有交互，所有模型会变得更加敏感。<br><em>SAINT</em>引入样本间的attention而不仅仅是属性间的attention，提高了行分类的准确率；<em>NPT</em>将其扩展为非参数Transformer，而Hopular使用了Hopfield网络，这与SAINT其实是本质上相同的。Trompt认为特征的重要性在不同样本中是不同的，在特征提取过程中，它将样本之间的信息作为prompts。<em>PTaRL</em>识别了在表格数据中的两种情况：纠缠与局部化，并使用原型生成(prototype generation)和表示投影(representation project)来产生更加清晰且一致的决策。<br><strong>Neighbor Retrieval</strong>：这种方法构造了高质量的内容来帮助提取有价值的邻居，并找到高效的方法来利用他们之间的关系。训练样本被用于协助测试。<em>DNNR</em>向KNN中引入本地梯度估计和Taylor多项式逼近；<em>TabR</em>将所有候选样本编码并使用类注意力机制来检索样本。<em>ModernNCA</em>使用了传统NCA方法并引入了深度学习策略与架构。<br><em><strong>有趣的是，作者在这里留下了一段话：目前的基于近邻的方法类似于in-context learning(上下文学习)，尤其是最近的TabPFN；LoCalPFN也使用了本地回归来获取更有解释性的决策边界，这也正是使用了本地信息。</strong></em></p>
+<h3 id="Objective-Aspect"><a href="#Objective-Aspect" class="headerlink" title="Objective Aspect"></a>Objective Aspect</h3><p>从客观角度，修改损失函数和整体目标(Overall objective)来引导模型特定的模式与偏好，注入inductive  bias(推断偏倚)。<br>就像L1-正则化(LASSO)、L2-正则化(Ridge)，Objective-aspect methods在深度学习中是这些传统方法的拓展，通过修改损失函数和正则化因子获取推断偏倚。这里Objective Aspect又可以分为两类，一类是Training Objective可以用特化能力来增强模型，另一类则引入正则化因子，增强模型的泛化能力。<br><strong>Training Objective</strong>：<em>PTaRL</em>构建了原型生成的投影空间并学习了全局原型的解耦表征。使用了一个多样性约束（diversification constraint），用于校准表示（representation calibration）并引入了一个矩阵正交化约束（matrix orthogonalization constraint），以保证不同原型之间的独立性（independence）。<br><strong>Training Regularization</strong>：<em>RLNs</em>通过在训练过程中引入了高效调参方案克服了难以驾驭的超参数，这种方法最小化一种特别的反事实损失。RLNs中，正则化因子与模型参数同时被优化并最终得到一个稀疏的网络。<em>TANGOS</em>使用了基于正则化的提升方法，它通过正则化神经元属性来保证神经元特化且正交。<em>Regularization cocktails for MLPs</em>通过特定数据集合的13种正则化方法，能让简单的神经网络效果大大提升，甚至超过树学习模型(XGboost)</p>
+<h1 id="5-从特化模型到迁移模型-From-specialized-to-transferable-model"><a href="#5-从特化模型到迁移模型-From-specialized-to-transferable-model" class="headerlink" title="5 从特化模型到迁移模型(From specialized to transferable model)"></a>5 从特化模型到迁移模型(From specialized to transferable model)</h1><p>从头训练一个模型会非常困难，取而代之的是训练一个预训练的模型(PTM: Pre-Training Model)。<br>使用预训练模型主要分为两个阶段：1. 表格模型的预训练；2.根据下游任务使用特定的适应策略来训练模型。正式的说，一个well-trained模型$g_{\Theta}$可以被用于加速$\mathcal{D}$上的模型$f_{\theta}$。为了使用$g_{\Theta}$中的专业信息，一种适应策略被使用：$f_{\theta}&#x3D;\mathbf{Adapt}(f_{\theta_{0}} | \mathcal{D}, g_{\Theta})$其中$\theta_{0}$是模型的初始化。这种标注可以被拓展到PTM之外。使用PTM的挑战在于将PTM与表格模型相关联。基于PTM的来源，我们将PTM分为3种类型：<br><strong>Homogeneous Transferable Tabular Model</strong>：同质性迁移模型，PTM可能与表格模型共享相同的任务，但是却有不同的分布，即$Pr(\mathcal{D}’) \neq Pr(\mathcal{D}) \space or \space g \neq f$<br><strong>Heterogeneous Transferable Tabular Model</strong>：异质性迁移模型，任务不同。<br><strong>Cross-Modal Transferable Tabular Model</strong>：跨模态迁移模型，PTM可以是另外一种模态，比如视觉或者语言模型，比如属性的语义学信息，就是将大语言模型作为PTM用以提供潜在的语义学信息。<br><strong>迁移模型的好处与坏处</strong>：好处：加速收敛、减少数据量、减少可学习参数量，减少计算量和调参量。</p>
+<h2 id="Homogeneous-Transferable-Tabular-Model"><a href="#Homogeneous-Transferable-Tabular-Model" class="headerlink" title="Homogeneous Transferable Tabular Model"></a>Homogeneous Transferable Tabular Model</h2><p>这方面研究在深度学习时代之前便已出现，一个代表性的方法就是有偏正则化(biased regularization：在深度学习和机器学习中引入先验偏好或结构性偏差的正则化技术，其核心目的是引导模型朝特定方向学习，而不仅仅是防止过拟合)，通过最小化PTM和目标模型的差别：<br>$$\min_{W}\mathscr{l}(W)+|W-W’|<em>{F}^2&#x3D;\min</em>{\Delta W}\mathscr{l}(\Delta W+W’)+|\Delta W|_{F}^2$$<br>对于相似的模型，可以通过修改训练目标为权重残差。对于MLP，可以通过比较两者的预测结果。<br><strong>Supervised Pre-training Objectives</strong>：一种将目标变量融入预训练的方法是使用输入干扰(例如对于某变量遮蔽后训练)作为一种对于标准监督学习目标的增强方法。<br><strong>Self-Supervised Pretraining Objectives</strong>：自监督预训练目标包括：masked language model, contrastive pre-training, hybrid method. <strong>masked language model(MLM)</strong>，无监督训练目标，每个样本中随机的特征会被遮蔽，遮蔽的值会通过多目标分类方法来预测。<em>VIME</em>使用干扰的表格数据预测哪部分向量被遮掩并试图为自监督学习重新构建特征向量。他们通过使用已经训练的编码器为每个样本产生多个增广的样本，具体方法就是1.对于每个样本使用多种遮蔽方法，2.然后使用模型对遮蔽的特征进行填充以恢复该值以实现数据的增强和表示学习。<em>SubTab</em>发现通过特征子集重构数据效果会比使用具有干扰的数据更好地捕捉潜在表示。<em>SEFS</em>通过随机选取输入特征重构初始的输入并同时估计用以定义哪个特征被选中的阈值向量(gate vector)。<em>MET</em>使用所有特征表征的连接代替平均，并使用对抗重建损失(Adversarial reconstruction loss：一种类似于GAN的损失函数，由重建损失和对抗损失组成，前者就是常见的损失，后者则是判别器判断重建数据是否真实的损失)；<strong>Contrastive Pre-training</strong>，对比预训练使用数据增广来生成正样本对或者同一个样本的两个不同的增广视图，损失函数鼓励一个特征提取器将正样本对映射为相似的特征。对比学习的主要因素就是产生特定案例的正例样本和负例样本。<em>SCARF</em>会为每一个输入样本生成一个增强版本，他的方式是从样本所有特征中随机选出一部分特征，并将这些选中的特征值替换为该特征的边缘分布中随机抽取的值；<em>STab</em>依赖于多个权重共享的神经网络，通过利用停止梯度操作，可以通过更加复杂的正则化策略来学习特征中的不变性，避免了崩溃到平凡解(即所有样本的表示均相同)；<em>DoRA</em>通过样本间的前置任务(pretext task)和样本间的对比学习来学习上下文化表示(Contextualized representations)；<em>DACL+</em> 为了克服对于特定领域的依赖，使用Mixup噪声来产生相似和不相似的样本。<strong>Hybrid Methods</strong>：结合了多种方法，包括有监督的、无监督的。<em>LFR</em>通过同时重构多个随机生成映射函数来训练；<em>ReConTab</em>同时使用自监督学习和半监督学习，它使用了正则化方法来筛选变量，同时使用有标签的对比学习来蒸馏最相关的信息用以下游任务。</p>
+<h2 id="Heterogeneous-Transferable-Tabular-Model"><a href="#Heterogeneous-Transferable-Tabular-Model" class="headerlink" title="Heterogeneous Transferable Tabular Model"></a>Heterogeneous Transferable Tabular Model</h2><p>早期的异质性模型主要关注特征级别的异质性，一个主要的假设是：存在一部分特征是相同，另外一部分特征不同，我们可以利用那部分相同特征的权重。主要工作有<em>OPID</em>，<em>ReForm</em>。神经模型的有点就是我们可以很轻松的调参(fine-tuned)，我们可以冻结大部分的参数，只关注少部分的参数(例如分类头)来加速调参并减少过拟合。<br><strong>Reuse PTM Pre-trained from One Dataset</strong>：这种方法主要关注预训练模型和目标任务的数据集之间的不同。<br><strong>Reuse PTM Pre-trained from Multiple Datasets</strong>：<em>XTab</em>通过利用独立特征（independent features）和联邦学习（federated learning）来预训练共享组件（shared component）。</p>
+<h2 id="Reusing-a-Pre-trained-Language-Model"><a href="#Reusing-a-Pre-trained-Language-Model" class="headerlink" title="Reusing a Pre-trained Language Model"></a>Reusing a Pre-trained Language Model</h2><p>标准情况下，有两种类型的语义学信息可以被使用：第一，每个特征的属性名称，$\mathcal{A}&#x3D; A_{1}, \dots, A_{d}$；第二，meta-information例如文本描述，被记录为”meta_descript”可以进一步增加理解，学习过程可以被公式化为:<br>$$\hat{y_{i}}&#x3D;f(x_{i}, \mathcal{A}|\mathcal{D},\mathbf{meta_{descript}})$$<br>这里语义学信息作为连接特征空间的桥梁和促进从预训练模型向下游任务知识迁移的工具。<br><strong>Language Models for Feature Tokenization</strong>：当特征空间改变时，语言学方法假设语义学关联性在特征描述之间存在且依赖于大语言模型捕捉这些关联的能力。例如，特征“occupation”和特征”organization”之间存在语义学关联，这使得这个特征可以被反复使用。<br><em>TransTab</em>根据表格数据中存在的词语训练一个分词器，并将列描述和表格作为输入，输入到一个门控transformer模型，这个模型时通过自监督学习或者有监督对比学习来训练的，并在迁移任务与特征连续学习的任务中验证；<em>PTab</em>使用一种相似的方式，使用多个被分词后的表格数据学习上下文表示；<em>UniTabE</em>编码并融合来自于列名称、数据类型和单元格值的信息并转化为一系列的tokens，使用Transformer与LSTM的编码器-解码器的架构。它使用了多单元格遮盖与对比学习进行预训练，在这里一个样本的子向量被当作正样本，其他样本或者其他样本的子集被作为负样本。<em>CM2</em>使用了一种提出了一个跨表格的预训练框架，能够整合属性名称与特征值。它使用了pMTM(prompt-based Masked Table Modeling)自监督目标，列名被作为prompt来帮助预测遮掩的特征；<em>TP-BERTa</em>按照类似的方法，但是加上了数值离散化策略、数量级标记化和微调更小的预训练语言模型(RoBERTa)；<em>CARTE</em>使用图注意力机制，关注列名和近邻输入，使用对比学习并构建了graphlet(图中所有不同构的子图)。<br><strong>Language Models for Features Engineering</strong>：<em>Binder</em>识别模型无法直接回答的问题并使用LLMs产生辅助特征；<em>CAAFE</em>探索使用LLMs，基于任务语义和特征语义进行生成，并用 TabPFN 来评估这些特征的质量；<em>FeatLLM</em>使用基于样本的prompting来加强特征生成，让LLMs有能力产生新的特征；<em>TaPTaP</em>为了捕捉广义表格数据中的数据分布，在大规模语义库中进行训练。训练完成后，可用于生成高质量的合成表格数据。<br><strong>Language Models for Textual Serialization</strong>：使用预训练语言模型的直接方法包括将表格数据转化为文本数据，让LLMs可以直接推断特征与标签之间的关系。<em>LIFT</em>、<em>TabLLM</em>、<em>UniPredict</em>。但是文本序列化方法依旧存在许多挑战，比如特征数过多时可能造成prompt过长、受限于语义学信息的可用性和外部模型能力。</p>
+<h2 id="Reusing-a-Pre-trained-Vision-Model"><a href="#Reusing-a-Pre-trained-Vision-Model" class="headerlink" title="Reusing a Pre-trained Vision Model"></a>Reusing a Pre-trained Vision Model</h2><p>最主要的挑战在于：将表格数据转化为图像。在自然图片中，临近的像素经常有相同的语义学相关性，但是表格数据缺少这种空间结构。同时，表格数据的特征是插入不变性，意味着交换顺序不会影响样本的意义(有些类似于图神经网络)。<br><strong>Dimensionality Reduction Transformation</strong>：<em>DeepInsight</em>使用t-SNE将表格数据转入2D空间并通过凸包分析、旋转等方法构建图片；<em>REFINED</em>使用贝叶斯度量多维度放缩来保证样本在低维度表征中的距离以维持结构相似的模型依旧保有最近的关系。<br><strong>Table Reorganization Transformation</strong>：表格数据库可以被当作一个矩阵。<em>TAC</em>使用CNN；<em>ICTD</em>和<em>TablEye</em>有相同的思路，产生一个图像，其中像素点暗度对于特征值。<br><strong>Image Marker Transformation</strong>：将特征值编码为可视的标记。例如<em>Super-TML</em>、<em>Tab2Visual</em>。<br>通过将表格数据转为图像，这些方法可以让强大的图像处理模型用于表格数据。<br>最近时间有些紧张，因为已经进入考试月了(悲),所以先写一半，剩余部分有空再写吧(希望有时间)。</p>
+<hr>
+
+<p>Cover image icon by <a target="_blank" rel="noopener" href="https://www.flaticon.com/free-icons/inference" title="inference icons">Dewi Sari</a> from <a target="_blank" rel="noopener" href="https://www.flaticon.com/free-icons/inference" title="inference icons">Flaticon</a></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://evanescence0515.github.io">Henry</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://evanescence0515.github.io/2025/05/28/Tabular-Review-1/">http://evanescence0515.github.io/2025/05/28/Tabular-Review-1/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="http://evanescence0515.github.io" target="_blank">Evanescence's Blog</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a></div><div class="post-share"><div class="social-share" data-image="/img/deeplearning_pic.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related full-width" href="/2025/05/10/GNN/" title="GNN"><img class="cover" src="/img/deeplearning_pic.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">GNN</div></div><div class="info-2"><div class="info-item-1">图是我们身边非常常见的结构，最近的一些研究让我们能够使用图结构的优势，在许多领域，如抗生素的研究、物理仿真、虚假新闻的识别，交通预测和推荐系统都有了最新的研究与实践。这篇学习&#x2F;总结博客参考了biliili上李沐的带读以及A Gentle Introduction to GNN这篇文章探索并解释了现代图神经网络，我们将工作分为4个部分：1. 什么类型的数据可以以图的形式记录；2. 图结构的特点与优势：相较于CNN或者传统深层神经网络；3. 建造一个GNN模型：从一个骨架到SOTA；4. 提供一个GNN playground供读者探究(会超链接回原文章)。 What a Graph is图是一系列实体之间的关系如果我们用图论的知识来看，图的描述其实有多种方式，如：邻接矩阵、集合的表示。我们这里采用相对容易接受的集合表示方法：一个图主要由 节点(Nodes) 和 边(Edges) 构成。以下图为例：其中存在5个节点，与6条边。其中点集合为$V &#x3D; { A,B,C,D,E }$。边集合为$E &#x3D; { AB, BC,CD,DE,AE, CE...</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2025/05/08/CLIP/" title="CLIP"><img class="cover" src="/img/deeplearning_pic.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-05-08</div><div class="info-item-2">CLIP</div></div><div class="info-2"><div class="info-item-1">CLIP将计算机视觉与自然语言处理相结合，获得更加优秀的迁移性能与zero-shot效果。同时打破了固定标签的定式。 Abstract针对目前已有的计算机视觉系统，大部分都是使用固定的标签集合，这限制了它的泛化性能和可用性。于是作者选择通过图片的语言文本来进行图像识别。作者爬取了4亿张图片以进行模型的预训练。在预训练完成后，作者在30多个任务上进行了测试。在ImageNet数据集内，CLIP模型在zero-shot的情况下便已经与训练完成的Resnet50打成平手。 IntroductionGPT作为一个”Text-in-text-out”的经典案例，反映了弱监督工作的可行性，于是作者决定提出使用图片与文字结合，进行CLIP模型的研究。已有相关研究VirTex,...</div></div></div></a><a class="pagination-related" href="/2025/05/10/GNN/" title="GNN"><img class="cover" src="/img/deeplearning_pic.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-05-10</div><div class="info-item-2">GNN</div></div><div class="info-2"><div class="info-item-1">图是我们身边非常常见的结构，最近的一些研究让我们能够使用图结构的优势，在许多领域，如抗生素的研究、物理仿真、虚假新闻的识别，交通预测和推荐系统都有了最新的研究与实践。这篇学习&#x2F;总结博客参考了biliili上李沐的带读以及A Gentle Introduction to GNN这篇文章探索并解释了现代图神经网络，我们将工作分为4个部分：1. 什么类型的数据可以以图的形式记录；2. 图结构的特点与优势：相较于CNN或者传统深层神经网络；3. 建造一个GNN模型：从一个骨架到SOTA；4. 提供一个GNN playground供读者探究(会超链接回原文章)。 What a Graph is图是一系列实体之间的关系如果我们用图论的知识来看，图的描述其实有多种方式，如：邻接矩阵、集合的表示。我们这里采用相对容易接受的集合表示方法：一个图主要由 节点(Nodes) 和 边(Edges) 构成。以下图为例：其中存在5个节点，与6条边。其中点集合为$V &#x3D; { A,B,C,D,E }$。边集合为$E &#x3D; { AB, BC,CD,DE,AE, CE...</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/my_icon.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Henry</div><div class="author-info-description">至此鲜花赠自己，纵马踏花向自由</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">13</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">3</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">3</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/evanescence0515"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/evanescence0515" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:evanescence0515@gmail.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">你好呀，这里是Evanescence的博客，  我会经常分享一些学习统计学、生物信息学、机器学习和计算机技术的心得和笔记。</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-3"><span class="toc-number">1.</span> <span class="toc-text">1-3</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#4-%E7%89%B9%E5%AE%9A%E6%96%B9%E6%B3%95%E7%9A%84%E5%88%86%E7%B1%BB"><span class="toc-number">2.</span> <span class="toc-text">4 特定方法的分类</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Specialized-method"><span class="toc-number">2.1.</span> <span class="toc-text">Specialized method</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Feature-Aspect"><span class="toc-number">2.1.1.</span> <span class="toc-text">Feature Aspect</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Feature-Encoding"><span class="toc-number">2.1.1.1.</span> <span class="toc-text">Feature Encoding</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Feature-Selection"><span class="toc-number">2.1.1.2.</span> <span class="toc-text">Feature Selection</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Feature-Projection"><span class="toc-number">2.1.1.3.</span> <span class="toc-text">Feature Projection</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Feature-Interaction"><span class="toc-number">2.1.1.4.</span> <span class="toc-text">Feature Interaction</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Sample-Aspect"><span class="toc-number">2.1.2.</span> <span class="toc-text">Sample Aspect</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Objective-Aspect"><span class="toc-number">2.1.3.</span> <span class="toc-text">Objective Aspect</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#5-%E4%BB%8E%E7%89%B9%E5%8C%96%E6%A8%A1%E5%9E%8B%E5%88%B0%E8%BF%81%E7%A7%BB%E6%A8%A1%E5%9E%8B-From-specialized-to-transferable-model"><span class="toc-number">3.</span> <span class="toc-text">5 从特化模型到迁移模型(From specialized to transferable model)</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Homogeneous-Transferable-Tabular-Model"><span class="toc-number">3.1.</span> <span class="toc-text">Homogeneous Transferable Tabular Model</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Heterogeneous-Transferable-Tabular-Model"><span class="toc-number">3.2.</span> <span class="toc-text">Heterogeneous Transferable Tabular Model</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Reusing-a-Pre-trained-Language-Model"><span class="toc-number">3.3.</span> <span class="toc-text">Reusing a Pre-trained Language Model</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Reusing-a-Pre-trained-Vision-Model"><span class="toc-number">3.4.</span> <span class="toc-text">Reusing a Pre-trained Vision Model</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2025/05/28/Tabular-Review-1/" title="表格数据学习方法综述阅读(上)"><img src="/img/deeplearning_pic.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="表格数据学习方法综述阅读(上)"/></a><div class="content"><a class="title" href="/2025/05/28/Tabular-Review-1/" title="表格数据学习方法综述阅读(上)">表格数据学习方法综述阅读(上)</a><time datetime="2025-05-28T09:05:48.000Z" title="发表于 2025-05-28 17:05:48">2025-05-28</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/05/10/GNN/" title="GNN"><img src="/img/deeplearning_pic.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="GNN"/></a><div class="content"><a class="title" href="/2025/05/10/GNN/" title="GNN">GNN</a><time datetime="2025-05-10T12:06:12.000Z" title="发表于 2025-05-10 20:06:12">2025-05-10</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/05/10/CausalInferenceIntro/" title="因果推断初步——反因果框架"><img src="/img/inference_pic.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="因果推断初步——反因果框架"/></a><div class="content"><a class="title" href="/2025/05/10/CausalInferenceIntro/" title="因果推断初步——反因果框架">因果推断初步——反因果框架</a><time datetime="2025-05-10T07:58:24.000Z" title="发表于 2025-05-10 15:58:24">2025-05-10</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/05/10/%E5%BE%AA%E8%AF%81%E5%8C%BB%E5%AD%A69-12%E5%91%A8%E5%9B%9E%E9%A1%BE/" title="循证医学9-12周回顾"><img src="/img/epidemic_pic.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="循证医学9-12周回顾"/></a><div class="content"><a class="title" href="/2025/05/10/%E5%BE%AA%E8%AF%81%E5%8C%BB%E5%AD%A69-12%E5%91%A8%E5%9B%9E%E9%A1%BE/" title="循证医学9-12周回顾">循证医学9-12周回顾</a><time datetime="2025-05-10T07:41:45.000Z" title="发表于 2025-05-10 15:41:45">2025-05-10</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/05/08/CLIP/" title="CLIP"><img src="/img/deeplearning_pic.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="CLIP"/></a><div class="content"><a class="title" href="/2025/05/08/CLIP/" title="CLIP">CLIP</a><time datetime="2025-05-08T11:16:23.000Z" title="发表于 2025-05-08 19:16:23">2025-05-08</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2019 - 2025 By Henry</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.3.5</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"><script>(() => {
+  const loadMathjax = () => {
+    if (!window.MathJax) {
+      window.MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']],
+          tags: 'none',
+        },
+        chtml: {
+          scale: 1.1
+        },
+        options: {
+          enableMenu: true,
+          renderActions: {
+            findScript: [10, doc => {
+              for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+                const display = !!node.type.match(/; *mode=display/)
+                const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display)
+                const text = document.createTextNode('')
+                node.parentNode.replaceChild(text, node)
+                math.start = {node: text, delim: '', n: 0}
+                math.end = {node: text, delim: '', n: 0}
+                doc.math.push(math)
+              }
+            }, '']
+          }
+        }
+      }
+
+      const script = document.createElement('script')
+      script.src = 'https://cdn.jsdelivr.net/npm/mathjax/es5/tex-mml-chtml.min.js'
+      script.id = 'MathJax-script'
+      script.async = true
+      document.head.appendChild(script)
+    } else {
+      MathJax.startup.document.state(0)
+      MathJax.texReset()
+      MathJax.typesetPromise()
+    }
+  }
+
+  btf.addGlobalFn('encrypt', loadMathjax, 'mathjax')
+  window.pjax ? loadMathjax() : window.addEventListener('load', loadMathjax)
+})()</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">Search</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索内容..." type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div></body></html>
