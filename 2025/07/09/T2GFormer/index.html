@@ -166,8 +166,19 @@
 </ol>
 <h1 id="Graph-Estimator"><a href="#Graph-Estimator" class="headerlink" title="Graph Estimator"></a>Graph Estimator</h1><p>GE将表格数据特征作为图节点、特征相关性作为边。其设计理念来自于<em>知识图谱补全knowledge graph completion</em>，也就是使用了两个实体的语义学相关性来估计关系的可信度。一个基础的式子被用于描述这样的语义学相关性:<br>$$f_{r}(h,t)&#x3D;h^TM_{r}t$$<br>其中$h,t\in \mathbb{R}^n$是头实体节点的编码和尾实体节点的编码，$M_{r} \in \mathbb{R}^{n\times n}$是一个可学习矩阵，用于在知识图谱(KG, Knowledge Graph)中表示关系r。许多相关方法均来自于该公式，唯一不同的就是关系编码和评分函数。<br>不同于KGC模型只计算静态的关系可信度，GE借助可适应的边权重，借助静态的潜在图拓扑结构来估计特征的关系。我将每个特征作为一个节点，首先使用语义学上的匹配来估计每对特征关系的软可信度(这被作者称为<strong>数据适应的边权重</strong>)；其次，一个<strong>静态知识拓扑结构</strong>基于数据列语义被学习并构建，其被用于保留重要特征对的交互项。最后，边权重与知识拓扑结构集成以形成FR-Graph.</p>
 <h2 id="FR-Graph-Structure-Components"><a href="#FR-Graph-Structure-Components" class="headerlink" title="FR-Graph Structure Components"></a>FR-Graph Structure Components</h2><p>为了挖掘表格数据的特征关联，我们通过将表格特征作为图节点的候选项并预测节点间的边来构建FR-Graph。边是来自于两个角度：自适应的边权重表示了特定数据的信息；静态的边拓扑结构展示了潜在的信息。其中，有部分节点与FR-Graph相独立，这是因为没有节点与之相连。</p>
-<h3 id="Adaptive-Edge-Weight"><a href="#Adaptive-Edge-Weight" class="headerlink" title="Adaptive Edge Weight"></a>Adaptive Edge Weight</h3><p>考虑两个表格数据特征嵌入向量$x_{i},x_{j}\in \mathbb{R}^n(i,j\in{1,2,\dots,N})$其中$N$为输入特征的数量，我们通过如下方式估计交互可信度：<br>$$G_{\omega}[i,j]&#x3D;g_{\omega}(f_{i}^h, f_{j}^t)&#x3D;{f_{i}^h}^T \mathrm{diag}(r)f_{j}^t$$<br>$$f_{i}^h&#x3D;W^hx_{i},f_{i}^t&#x3D;W^tx_{i}, \left { \begin{aligned}<br>&amp;W^h &#x3D; W^t \space \mathrm{if} \space \mathrm{symmetric}\<br>&amp;W^h \neq W^t \space \mathrm{if \space asymmetric}</p>
-<p>\end{aligned}<br>\right.$$<br>其中，可学习的两个参数$W^h, W^t \in \mathbb{R}^{m\times n}$记为对于头特征和尾特征的转化，$\mathrm{diag}(r)\in \mathbb{R}^{m\times m}$(原文写的是$\mathbb{R}^{n\times n}$)是一个对角矩阵，该对角矩阵是由可学习的关系向量$r \in \mathbb{R}^n$参数化而来，其语义上表示了特征的关系。$W^h$与$W^t$如果是对称的(无向的)，则共享参数，在非对称的例子中则不相等。出于书写的方便，所有偏置项都被省去。最终，自适应权重评分$g_{\omega}$构成了一个全连接的加权图，这样的一张图将会在diag(r)为单位阵时退化成一个注意力评分，因此，它也能计算加权特征相似性。</p>
+<h3 id="Adaptive-Edge-Weight"><a href="#Adaptive-Edge-Weight" class="headerlink" title="Adaptive Edge Weight"></a>Adaptive Edge Weight</h3><p>考虑两个表格数据特征嵌入向量$x_{i},x_{j}\in \mathbb{R}^n(i,j\in{1,2,\dots,N})$其中$N$为输入特征的数量，我们通过如下方式估计交互可信度：<br>$$G_{\omega}[i,j]&#x3D;g_{\omega}(f_{i}^h, f_{j}^t)&#x3D;{f_{i}^h}^T \mathrm{diag}(r)f_{j}^t$$</p>
+<p>$$<br>f_i^h &#x3D; W^h x_i,\quad f_i^t &#x3D; W^t x_i,\quad<br>$$</p>
+
+$$
+\left \{
+\begin{array}{ll}
+W^h = W^t & \text{if symmetric} \\
+W^h \ne W^t & \text{if asymmetric}
+\end{array}
+\right.
+$$
+
+<p>其中，可学习的两个参数$W^h, W^t \in \mathbb{R}^{m\times n}$记为对于头特征和尾特征的转化，$\mathrm{diag}(r)\in \mathbb{R}^{m\times m}$(原文写的是$\mathbb{R}^{n\times n}$)是一个对角矩阵，该对角矩阵是由可学习的关系向量$r \in \mathbb{R}^n$参数化而来，其语义上表示了特征的关系。$W^h$与$W^t$如果是对称的(无向的)，则共享参数，在非对称的例子中则不相等。出于书写的方便，所有偏置项都被省去。最终，自适应权重评分$g_{\omega}$构成了一个全连接的加权图，这样的一张图将会在diag(r)为单位阵时退化成一个注意力评分，因此，它也能计算加权特征相似性。</p>
 <h3 id="Static-Knowledge-Topology"><a href="#Static-Knowledge-Topology" class="headerlink" title="Static Knowledge Topology"></a>Static Knowledge Topology</h3><p>静态相关拓扑评分可以如下计算：</p>
 
 $$G_{t}[i,j]=g_{t}(e_{i}^h, e_{j}^t)=\frac{{e_{i}^h}^Te_{j}^t}{||e_{i}^h||_{2}||e_{j}^t||_{2}}$$
