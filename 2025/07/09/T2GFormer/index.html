@@ -1,0 +1,229 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>T2GFormer | Evanescence's Blog</title><meta name="author" content="Henry"><meta name="copyright" content="Henry"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="ffffff"><meta name="description" content="Introduction作者在这篇文章中提出了一种新的特征交互方式。这种方式基于一种新型的图估计器，这种估计器可以自动估计特征之间的关系并通过连接相关特征来构造图像。一种特别的 跨层读取(Cross-level Readout) 收集了通过T2Gformer预测的不同层的突出特征并获取全局信息并作出预测。T2Gformer优于深度神经网络并与非深GBDT能力相近。T2Gformer的优势在于特征交">
+<meta property="og:type" content="article">
+<meta property="og:title" content="T2GFormer">
+<meta property="og:url" content="http://evanescence0515.github.io/2025/07/09/T2GFormer/index.html">
+<meta property="og:site_name" content="Evanescence&#39;s Blog">
+<meta property="og:description" content="Introduction作者在这篇文章中提出了一种新的特征交互方式。这种方式基于一种新型的图估计器，这种估计器可以自动估计特征之间的关系并通过连接相关特征来构造图像。一种特别的 跨层读取(Cross-level Readout) 收集了通过T2Gformer预测的不同层的突出特征并获取全局信息并作出预测。T2Gformer优于深度神经网络并与非深GBDT能力相近。T2Gformer的优势在于特征交">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://evanescence0515.github.io/img/deeplearning_pic.png">
+<meta property="article:published_time" content="2025-07-09T01:15:59.000Z">
+<meta property="article:modified_time" content="2025-07-09T01:15:59.000Z">
+<meta property="article:author" content="Henry">
+<meta property="article:tag" content="深度学习">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://evanescence0515.github.io/img/deeplearning_pic.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "T2GFormer",
+  "url": "http://evanescence0515.github.io/2025/07/09/T2GFormer/",
+  "image": "http://evanescence0515.github.io/img/deeplearning_pic.png",
+  "datePublished": "2025-07-09T01:15:59.000Z",
+  "dateModified": "2025-07-09T01:15:59.000Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Henry",
+      "url": "http://evanescence0515.github.io/"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://evanescence0515.github.io/2025/07/09/T2GFormer/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', 'ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"未找到符合您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'T2GFormer',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg" style="background-color: #EEEEEE;"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/my_icon.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">14</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">3</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">3</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> List</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/tools/"><i class="fa-fw fas fa-tools"></i><span> Tools</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(img/deeplearning_pic.png);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Evanescence's Blog</span></a><a class="nav-page-title" href="/"><span class="site-name">T2GFormer</span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> Search</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> List</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/tools/"><i class="fa-fw fas fa-tools"></i><span> Tools</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">T2GFormer</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-07-09T01:15:59.000Z" title="发表于 2025-07-09 09:15:59">2025-07-09</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-07-09T01:15:59.000Z" title="更新于 2025-07-09 09:15:59">2025-07-09</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><h1 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h1><p>作者在这篇文章中提出了一种新的特征交互方式。这种方式基于一种新型的图估计器，这种估计器可以自动估计特征之间的关系并通过连接相关特征来构造图像。一种特别的 <strong>跨层读取(Cross-level Readout)</strong> 收集了通过T2Gformer预测的不同层的突出特征并获取全局信息并作出预测。T2Gformer优于深度神经网络并与非深GBDT能力相近。<br>T2Gformer的优势在于特征交互项的提取，所以作者在引入中便提及：已有的特征选择方法可以被分为“软”与”硬”版本。”软”版本本质上运用特征间的全连接交互项，例如乘法交互项、特征交叉与基于注意力的交互。但是表格特征本质上就带有异质性，所以全连接交互是一个次优的选项因为其盲目地将所有特征融合在一起。<em>DANets</em>使用了”硬”版本，其将相关的特征分组并将交互限制在被分组的特征内，虽然DANets取得了非常有潜力的成果，他的特征选取操作依旧不能解决组内交互的问题，因此同一组的特征被无差别的融合，使得模型表达能力下降。<br>作者设计了Graph Estimator(GE)来组织表格特征为一个特征关联图(FR-Graph)，更进一步的，作者通过堆叠GE融合块用于特征交互，并辅助以一个transformer架构的神经网络，这种新的架构被称为t2g-transformer。<br>GE通过以下几点构建特征交互图：</p>
+<ol>
+<li>一个静态的可以描述任务的潜在知识的图拓扑结构。</li>
+<li>适应数据的边权重。<br>在作者提出的T2G-Former中，每层使用了FR-Graph来将输入特征转化为图特征，异质性特征交互是遵循图中边的指定结构来有序的进行。同时，一个特殊的跨层读取收集了每个分级的突出特征并获取全局表格语义以作出最终决策。<br>作者这项工作的主要贡献如下：<br> 首次使用了特征图来处理特征异质性的问题，并提出了一个GE模块来进行特征相关性组织<br> 在Transformer架构中使用了FR-Graph并构建了特定的T2G-Former模型进行表格数据的分类与回归。<br> T2G-Former的表现在许多数据库上优于SOTA tabular DNNs，并且可与GBDTs相抗衡。</li>
+</ol>
+<h1 id="Graph-Estimator"><a href="#Graph-Estimator" class="headerlink" title="Graph Estimator"></a>Graph Estimator</h1><p>GE将表格数据特征作为图节点、特征相关性作为边。其设计理念来自于<em>知识图谱补全knowledge graph completion</em>，也就是使用了两个实体的语义学相关性来估计关系的可信度。一个基础的式子被用于描述这样的语义学相关性:<br>$$f_{r}(h,t)&#x3D;h^TM_{r}t$$<br>其中$h,t\in \mathbb{R}^n$是头实体节点的编码和尾实体节点的编码，$M_{r} \in \mathbb{R}^{n\times n}$是一个可学习矩阵，用于在知识图谱(KG, Knowledge Graph)中表示关系r。许多相关方法均来自于该公式，唯一不同的就是关系编码和评分函数。<br>不同于KGC模型只计算静态的关系可信度，GE借助可适应的边权重，借助静态的潜在图拓扑结构来估计特征的关系。我将每个特征作为一个节点，首先使用语义学上的匹配来估计每对特征关系的软可信度(这被作者称为<strong>数据适应的边权重</strong>)；其次，一个<strong>静态知识拓扑结构</strong>基于数据列语义被学习并构建，其被用于保留重要特征对的交互项。最后，边权重与知识拓扑结构集成以形成FR-Graph.</p>
+<h2 id="FR-Graph-Structure-Components"><a href="#FR-Graph-Structure-Components" class="headerlink" title="FR-Graph Structure Components"></a>FR-Graph Structure Components</h2><p>为了挖掘表格数据的特征关联，我们通过将表格特征作为图节点的候选项并预测节点间的边来构建FR-Graph。边是来自于两个角度：自适应的边权重表示了特定数据的信息；静态的边拓扑结构展示了潜在的信息。其中，有部分节点与FR-Graph相独立，这是因为没有节点与之相连。</p>
+<h3 id="Adaptive-Edge-Weight"><a href="#Adaptive-Edge-Weight" class="headerlink" title="Adaptive Edge Weight"></a>Adaptive Edge Weight</h3><p>考虑两个表格数据特征嵌入向量$x_{i},x_{j}\in \mathbb{R}^n(i,j\in{1,2,\dots,N})$其中$N$为输入特征的数量，我们通过如下方式估计交互可信度：<br>$$G_{\omega}[i,j]&#x3D;g_{\omega}(f_{i}^h, f_{j}^t)&#x3D;{f_{i}^h}^T \mathrm{diag}(r)f_{j}^t$$<br>$$f_{i}^h&#x3D;W^hx_{i},f_{i}^t&#x3D;W^tx_{i}, \left { \begin{aligned}<br>&amp;W^h &#x3D; W^t \space \mathrm{if} \space \mathrm{symmetric}\<br>&amp;W^h \neq W^t \space \mathrm{if \space asymmetric}</p>
+<p>\end{aligned}<br>\right.$$<br>其中，可学习的两个参数$W^h, W^t \in \mathbb{R}^{m\times n}$记为对于头特征和尾特征的转化，$\mathrm{diag}(r)\in \mathbb{R}^{m\times m}$(原文写的是$\mathbb{R}^{n\times n}$)是一个对角矩阵，该对角矩阵是由可学习的关系向量$r \in \mathbb{R}^n$参数化而来，其语义上表示了特征的关系。$W^h$与$W^t$如果是对称的(无向的)，则共享参数，在非对称的例子中则不相等。出于书写的方便，所有偏置项都被省去。最终，自适应权重评分$g_{\omega}$构成了一个全连接的加权图，这样的一张图将会在diag(r)为单位阵时退化成一个注意力评分，因此，它也能计算加权特征相似性。</p>
+<h3 id="Static-Knowledge-Topology"><a href="#Static-Knowledge-Topology" class="headerlink" title="Static Knowledge Topology"></a>Static Knowledge Topology</h3><p>静态相关拓扑评分可以如下计算：</p>
+
+$$G_{t}[i,j]=g_{t}(e_{i}^h, e_{j}^t)=\frac{{e_{i}^h}^Te_{j}^t}{||e_{i}^h||_{2}||e_{j}^t||_{2}}$$
+
+<p>$$e_{i}^h&#x3D;E^h[:,i], e_{i}^t&#x3D;E^t[:,i],$$<br>其中$E\in{ E^h, E^t}$时一个可学习的列嵌入，其被分为头嵌入与尾嵌入。$E&#x3D;{ e_{1}, e_{2},\dots,e_{N}}\in \mathbb{R}^{d\times N}$，d是嵌入的维度。相似的，相关拓扑评分有对称与非对称两个版本，与加权特征相似性计算一样，对称时相同而非对称时不同。作者使用二范数来保证同量纲与训练稳定性(这不就是余弦相似度).<br>我们通过一下式子获得静态关联拓扑结构：<br>$$A&#x3D;f_{top}(G_{t})&#x3D;\mathbb{1}[\sigma_{1}(G_{t}+b)&gt;T]$$<br>其中$\sigma_{1}$是逐元素的激活函数，其具有一个可学习的参数b，$G_{t}$是一个邻接矩阵评分，由关联拓扑评分构成，T是一个常数阈值，$\mathbb{1}$记为指示函数，通过这种方法，我们获得了一种全局图拓扑结构来限制特征的交互，并且这样的拓扑结构可以被认为是整个任务上的静态知识。<br><em>这里原文讲得不是很清晰，后面对照代码来理解这一部分</em></p>
+<h2 id="Relation-Graph-Assembling"><a href="#Relation-Graph-Assembling" class="headerlink" title="Relation Graph Assembling"></a>Relation Graph Assembling</h2><p>当我们从数据角度获得了软自适应边权重，从知识角度获得了硬静态关系拓扑图结构，我们将他们组合起来产生一个FR-Graph：<br>$$G&#x3D;\sigma_{2}(f_{nsi}(A)\odot G_{\omega})$$<br>其中$\sigma_{2}$是一个竞争激活函数(例如$L_{p}$正则化、softmax、sparsemax)来限制每个节点的入度，$\odot$是Hadamard积(就是逐元素相乘)。最终的关系图G是一个同时基于适应性特征匹配与静态知识拓扑结构的加权图。为了让FR-Graph主要关注学习有意义的交互项，一个“非自我交互函数”$f_{nsi}$被使用用于精确排除G中的圈(self-loop)。我们使用FR-Graph来指导接下来的特征交互。同时，因为边权重与拓扑结构均有2种版本(非对称与对称)，所以在实验中，我们也会讨论不同版本对于结果的影响。</p>
+<h1 id="T2G-Former"><a href="#T2G-Former" class="headerlink" title="T2G-Former"></a>T2G-Former</h1><p>我们将GE结合到类注意力的模块，并且通过将多个块堆叠来构建T2G-Former。T2G-Former使用估计的FR-Graphs进行特征交互并获取高级特征，跨层读取按顺序被映射到每层的特征空间并选择性的收集特征性的特征以进行最终的预测。一条捷径被加入来从前一层中保留信息(残差)，最终形成一个在不同特征级别间的有门控融合。</p>
+<h2 id="Basic-Block"><a href="#Basic-Block" class="headerlink" title="Basic Block"></a>Basic Block</h2><p>每个块都配有GE用于特征交互，输入特征$X^l\in \mathbb{R}^{n\times N}$，$l$代表第$l$-层，我们使用如下式子获取下一层输入$X^{l+1}$<br>$$G^l&#x3D;GE(X^l), V^l&#x3D;W_{v}X^l$$<br>$$H^l&#x3D;G^lV^l+g(X^l), X^{l+1}&#x3D;FFN(H^l)+g(H^l)$$<br>$W_{v}\in \mathbb{R}^{m\times n}$是一个可学习的参数，用于特征映射，$V^l$时映射后的特征输入，FFN为前馈神经网络。环已在$G^l$中排除，g为捷径，在实验中就是一个dropout层。值得注意的是，我们产生并使用FR-Graph用于特征交互，但是它并不影响那些通过残差连接进行的特征内部更新。在第一层中，我们将输入的表格数据通过一个简单的tokenizer编码为$X_{0}$，以下我给出一个简单的tokenizer帮助理解在表格数据中，如何进行”分词”</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">FeatureTokenizer</span>(nn.Module):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, cat_dims, num_dim, embed_dim</span>):</span><br><span class="line">        <span class="built_in">super</span>().__init__()</span><br><span class="line">        <span class="variable language_">self</span>.cat_embeds = nn.ModuleList([</span><br><span class="line">            nn.Embedding(num_cat, embed_dim) <span class="keyword">for</span> num_cat <span class="keyword">in</span> cat_dims</span><br><span class="line">        ])</span><br><span class="line">        <span class="variable language_">self</span>.num_proj = nn.Linear(num_dim, embed_dim)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self, x_cat, x_num</span>):</span><br><span class="line">        cat_vecs = [emb(x_cat[:, i]) <span class="keyword">for</span> i, emb <span class="keyword">in</span> <span class="built_in">enumerate</span>(<span class="variable language_">self</span>.cat_embeds)]</span><br><span class="line">        num_vecs = <span class="variable language_">self</span>.num_proj(x_num)</span><br><span class="line">        <span class="keyword">return</span> torch.stack(cat_vecs + [num_vecs], dim=<span class="number">1</span>)  <span class="comment"># Shape: [B, #features, d]</span></span><br></pre></td></tr></table></figure>
+<p>通过这种方式，高级别的特征可以通过FR-Graph迭代的产生并选择性地交互。在使用过程中，层归一化的作用是保证稳定的训练。</p>
+<h2 id="Cross-level-Readout"><a href="#Cross-level-Readout" class="headerlink" title="Cross-level Readout"></a>Cross-level Readout</h2><p>我们设计了一个全局读取节点来选择性的收集每层中重要的特征并获取全面的语义学信息以进行最终的预测。特别的一点是，我们使用注意力机制融合当前层选择的特征，同时将他们与前一层的特征的捷径结合，当前读出层的状态为$z^l\in \mathbb{R}^n$收集过程可以被描述为：<br>$$\alpha_{i}^l&#x3D;g_{\omega}(h^l,f_{i}^t) \cdot f_{top}(g_{t}(e^l,e_{i}^t)),h^l&#x3D;W^hz^l $$<br>$$r^l&#x3D;\mathrm{softmax}(\alpha^l)^TV^l+z^l$$<br>$$z^{l+1}&#x3D;\mathrm{FFN}(r^l)+r^l$$<br>$\alpha_{i}^l$记为第i个特征的权重，$\alpha^l\in \mathbb{R}^N$是由$\alpha_{i}^l$构成，$e^l\in \mathbb{R}^d$是一个可学习的向量，其表示读出层的节点在第l层的语义学信息，$f_{i}^t$是每层编码的特征，$e_{i}^t$是一个逐层的列嵌入，$V^l$是映射后的输入特征(似乎这里公式书写有些问题，后续看代码修正)，这里，我们将$z^l$输入到相同的FFN中将当前的读出映射到第l+1层的特征空间。捷径直接被加入，没有任何信息丢失，收集过程从输入特征到最高级的特征一直被重复，这样的操作可以鼓励跨层的特征交互。</p>
+<h2 id="The-Overall-Architecture-and-Training"><a href="#The-Overall-Architecture-and-Training" class="headerlink" title="The Overall Architecture and Training"></a>The Overall Architecture and Training</h2><p>我们在每个块中默认使用8头GE，预测基于最后一层处理完成后的读出层状态<br>$$\hat{y}&#x3D;\mathrm{FC}(\mathrm{\mathrm{Re}LU(LN)}(z^L))$$<br>其中LN和FC分别表示层归一化和一个全连接层。使用交叉熵和均方误差作为损失函数，在过去的DNN中，我们测试了多种任务并观测到持续最优化静态图拓扑结构会造成模型的不稳定，所以，在其收敛后，我们将其固定以进行进一步的训练。<br>我们引入了额外的超参数$d$与$T$，在实验中，我们适应性地设定$d&#x3D;2\lceil \log_{2}N \rceil$，这是可以表示$N^2$<br>个二元元素的最小邻接矩阵的信息量，并保持$T&#x3D;0.5$在所有数据集中相同，$\sigma_{1}$是sigmoid，$\sigma_{2}$是softmax，对于示性函数，我们使用straight-through trick来计算梯度</p>
+<hr>
+
+<p>Cover image icon by <a target="_blank" rel="noopener" href="https://www.flaticon.com/authors/becris" title="Becris">Becris</a> from <a target="_blank" rel="noopener" href="https://www.flaticon.com/free-icons/deep-learning" title="deep learning icons">Flaticon</a></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://evanescence0515.github.io">Henry</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://evanescence0515.github.io/2025/07/09/T2GFormer/">http://evanescence0515.github.io/2025/07/09/T2GFormer/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="http://evanescence0515.github.io" target="_blank">Evanescence's Blog</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a></div><div class="post-share"><div class="social-share" data-image="/img/deeplearning_pic.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related full-width" href="/2025/05/28/Tabular-Review-1/" title="表格数据学习方法综述阅读(上)"><img class="cover" src="/img/deeplearning_pic.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">表格数据学习方法综述阅读(上)</div></div><div class="info-2"><div class="info-item-1">表格数据(tabular data)是日常生活中最常见的数据格式，为了挖掘表格数据中的有效信息，提出了很多相关的算法。这篇综述概括了表格数据的机器学习与深度学习方法，原文来自于南京大学LAMDA实验室中的LAMDA-tabular课题组，文章地址。 1-3对于tabular data的一些简单介绍，略过 4 特定方法的分类作者将模型分为三类：特化方法(specialized methods), 迁移方法(transferable methods), 广义方法(general methods)。 Specialized method作者从3个角度入手讲述特化模型的方法：Feature Aspect：特征角度来看，模型主要针对数据特征的关系进行建模。Sample Aspect：从样本特征来看，模型通过最大化每个样本最邻近样本的作用来预测。Objective Aspect：从客观角度，修改损失函数和整体目标(Overall objective)来引导模型特定的模式与偏好，注入inductive  bias(推断偏倚)。 Feature...</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2025/05/08/CLIP/" title="CLIP"><img class="cover" src="/img/deeplearning_pic.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-05-08</div><div class="info-item-2">CLIP</div></div><div class="info-2"><div class="info-item-1">CLIP将计算机视觉与自然语言处理相结合，获得更加优秀的迁移性能与zero-shot效果。同时打破了固定标签的定式。 Abstract针对目前已有的计算机视觉系统，大部分都是使用固定的标签集合，这限制了它的泛化性能和可用性。于是作者选择通过图片的语言文本来进行图像识别。作者爬取了4亿张图片以进行模型的预训练。在预训练完成后，作者在30多个任务上进行了测试。在ImageNet数据集内，CLIP模型在zero-shot的情况下便已经与训练完成的Resnet50打成平手。 IntroductionGPT作为一个”Text-in-text-out”的经典案例，反映了弱监督工作的可行性，于是作者决定提出使用图片与文字结合，进行CLIP模型的研究。已有相关研究VirTex,...</div></div></div></a><a class="pagination-related" href="/2025/05/10/GNN/" title="GNN"><img class="cover" src="/img/deeplearning_pic.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-05-10</div><div class="info-item-2">GNN</div></div><div class="info-2"><div class="info-item-1">图是我们身边非常常见的结构，最近的一些研究让我们能够使用图结构的优势，在许多领域，如抗生素的研究、物理仿真、虚假新闻的识别，交通预测和推荐系统都有了最新的研究与实践。这篇学习&#x2F;总结博客参考了biliili上李沐的带读以及A Gentle Introduction to GNN这篇文章探索并解释了现代图神经网络，我们将工作分为4个部分：1. 什么类型的数据可以以图的形式记录；2. 图结构的特点与优势：相较于CNN或者传统深层神经网络；3. 建造一个GNN模型：从一个骨架到SOTA；4. 提供一个GNN playground供读者探究(会超链接回原文章)。 What a Graph is图是一系列实体之间的关系如果我们用图论的知识来看，图的描述其实有多种方式，如：邻接矩阵、集合的表示。我们这里采用相对容易接受的集合表示方法：一个图主要由 节点(Nodes) 和 边(Edges) 构成。以下图为例：其中存在5个节点，与6条边。其中点集合为$V &#x3D; { A,B,C,D,E }$。边集合为$E &#x3D; { AB, BC,CD,DE,AE, CE...</div></div></div></a><a class="pagination-related" href="/2025/05/28/Tabular-Review-1/" title="表格数据学习方法综述阅读(上)"><img class="cover" src="/img/deeplearning_pic.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-05-28</div><div class="info-item-2">表格数据学习方法综述阅读(上)</div></div><div class="info-2"><div class="info-item-1">表格数据(tabular data)是日常生活中最常见的数据格式，为了挖掘表格数据中的有效信息，提出了很多相关的算法。这篇综述概括了表格数据的机器学习与深度学习方法，原文来自于南京大学LAMDA实验室中的LAMDA-tabular课题组，文章地址。 1-3对于tabular data的一些简单介绍，略过 4 特定方法的分类作者将模型分为三类：特化方法(specialized methods), 迁移方法(transferable methods), 广义方法(general methods)。 Specialized method作者从3个角度入手讲述特化模型的方法：Feature Aspect：特征角度来看，模型主要针对数据特征的关系进行建模。Sample Aspect：从样本特征来看，模型通过最大化每个样本最邻近样本的作用来预测。Objective Aspect：从客观角度，修改损失函数和整体目标(Overall objective)来引导模型特定的模式与偏好，注入inductive  bias(推断偏倚)。 Feature...</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/my_icon.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Henry</div><div class="author-info-description">至此鲜花赠自己，纵马踏花向自由</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">14</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">3</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">3</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/evanescence0515"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/evanescence0515" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:evanescence0515@gmail.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">你好呀，这里是Evanescence的博客，  我会经常分享一些学习统计学、生物信息学、机器学习和计算机技术的心得和笔记。</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Introduction"><span class="toc-number">1.</span> <span class="toc-text">Introduction</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Graph-Estimator"><span class="toc-number">2.</span> <span class="toc-text">Graph Estimator</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#FR-Graph-Structure-Components"><span class="toc-number">2.1.</span> <span class="toc-text">FR-Graph Structure Components</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Adaptive-Edge-Weight"><span class="toc-number">2.1.1.</span> <span class="toc-text">Adaptive Edge Weight</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Static-Knowledge-Topology"><span class="toc-number">2.1.2.</span> <span class="toc-text">Static Knowledge Topology</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Relation-Graph-Assembling"><span class="toc-number">2.2.</span> <span class="toc-text">Relation Graph Assembling</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#T2G-Former"><span class="toc-number">3.</span> <span class="toc-text">T2G-Former</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Basic-Block"><span class="toc-number">3.1.</span> <span class="toc-text">Basic Block</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Cross-level-Readout"><span class="toc-number">3.2.</span> <span class="toc-text">Cross-level Readout</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#The-Overall-Architecture-and-Training"><span class="toc-number">3.3.</span> <span class="toc-text">The Overall Architecture and Training</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2025/07/09/T2GFormer/" title="T2GFormer"><img src="/img/deeplearning_pic.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="T2GFormer"/></a><div class="content"><a class="title" href="/2025/07/09/T2GFormer/" title="T2GFormer">T2GFormer</a><time datetime="2025-07-09T01:15:59.000Z" title="发表于 2025-07-09 09:15:59">2025-07-09</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/05/28/Tabular-Review-1/" title="表格数据学习方法综述阅读(上)"><img src="/img/deeplearning_pic.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="表格数据学习方法综述阅读(上)"/></a><div class="content"><a class="title" href="/2025/05/28/Tabular-Review-1/" title="表格数据学习方法综述阅读(上)">表格数据学习方法综述阅读(上)</a><time datetime="2025-05-28T09:05:48.000Z" title="发表于 2025-05-28 17:05:48">2025-05-28</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/05/10/GNN/" title="GNN"><img src="/img/deeplearning_pic.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="GNN"/></a><div class="content"><a class="title" href="/2025/05/10/GNN/" title="GNN">GNN</a><time datetime="2025-05-10T12:06:12.000Z" title="发表于 2025-05-10 20:06:12">2025-05-10</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/05/10/CausalInferenceIntro/" title="因果推断初步——反因果框架"><img src="/img/inference_pic.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="因果推断初步——反因果框架"/></a><div class="content"><a class="title" href="/2025/05/10/CausalInferenceIntro/" title="因果推断初步——反因果框架">因果推断初步——反因果框架</a><time datetime="2025-05-10T07:58:24.000Z" title="发表于 2025-05-10 15:58:24">2025-05-10</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/05/10/%E5%BE%AA%E8%AF%81%E5%8C%BB%E5%AD%A69-12%E5%91%A8%E5%9B%9E%E9%A1%BE/" title="循证医学9-12周回顾"><img src="/img/epidemic_pic.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="循证医学9-12周回顾"/></a><div class="content"><a class="title" href="/2025/05/10/%E5%BE%AA%E8%AF%81%E5%8C%BB%E5%AD%A69-12%E5%91%A8%E5%9B%9E%E9%A1%BE/" title="循证医学9-12周回顾">循证医学9-12周回顾</a><time datetime="2025-05-10T07:41:45.000Z" title="发表于 2025-05-10 15:41:45">2025-05-10</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2019 - 2025 By Henry</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.3.5</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"><script>(() => {
+  const loadMathjax = () => {
+    if (!window.MathJax) {
+      window.MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']],
+          tags: 'none',
+        },
+        chtml: {
+          scale: 1.1
+        },
+        options: {
+          enableMenu: true,
+          renderActions: {
+            findScript: [10, doc => {
+              for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+                const display = !!node.type.match(/; *mode=display/)
+                const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display)
+                const text = document.createTextNode('')
+                node.parentNode.replaceChild(text, node)
+                math.start = {node: text, delim: '', n: 0}
+                math.end = {node: text, delim: '', n: 0}
+                doc.math.push(math)
+              }
+            }, '']
+          }
+        }
+      }
+
+      const script = document.createElement('script')
+      script.src = 'https://cdn.jsdelivr.net/npm/mathjax/es5/tex-mml-chtml.min.js'
+      script.id = 'MathJax-script'
+      script.async = true
+      document.head.appendChild(script)
+    } else {
+      MathJax.startup.document.state(0)
+      MathJax.texReset()
+      MathJax.typesetPromise()
+    }
+  }
+
+  btf.addGlobalFn('encrypt', loadMathjax, 'mathjax')
+  window.pjax ? loadMathjax() : window.addEventListener('load', loadMathjax)
+})()</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">Search</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索内容..." type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div></body></html>
