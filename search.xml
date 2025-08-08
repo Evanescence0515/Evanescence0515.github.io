@@ -4,7 +4,34 @@
   
     
     <entry>
-      <title>TabTransformer论文速读</title>
+      <title>VIME论文速读(2020, NeurIPS)</title>
+      <link href="/2025/08/08/VIME/"/>
+      <url>/2025/08/08/VIME/</url>
+      
+        <content type="html"><![CDATA[<p><a href="https://proceedings.neurips.cc/paper/2020/file/7d97667a3e056acab9aaf653807b4a03-Paper.pdf">VIME: Extending the Success of Self- and Semi-supervised Learning to Tabular Domain</a><br>在这篇文章中，作者提出了新的表格数据自监督与半监督学习框架。对于自监督学习，在特征向量预测器的基础上，作者提出了<strong>mask vector estimation+Feature vector estimation</strong>。为了解决前置任务，解码器函数学习从无标签的原始特征中构建富含信息的表示。对于半监督学习，作者引入了一种新的表格数据增广模式：使用训练的编码器，通过对于遮掩的数据进行插值来获取多个增广数据。</p><h1 id="要点速读"><a href="#要点速读" class="headerlink" title="要点速读"></a>要点速读</h1><p><strong>VIME</strong>模型主要是提出了在表格数据中使用无标签的数据进行预训练的策略：<br><strong>Mask Vector Estimation</strong>与<strong>Feature Vector Estimation</strong>：即在无标签的数据中进行污染，然后预测哪个数据遭受污染并预测污染数据的原数据。</p><h1 id="Proposed-Model-VIME"><a href="#Proposed-Model-VIME" class="headerlink" title="Proposed Model: VIME"></a>Proposed Model: VIME</h1><h2 id="自监督学习"><a href="#自监督学习" class="headerlink" title="自监督学习"></a>自监督学习</h2><p>相较于TabTransformer，VIME对于数据的污染是采用分类数据的分布，这样可以保证对于污染数据的识别有一定难度。<br>$$\tilde{\mathbf{x}}&#x3D;g_{m}(\mathbf{x},\mathbf{m})&#x3D;\mathbf{m}\odot \bar{\mathbf{x}}+(1-\mathbf{m})\odot \mathbf{x}$$<br>其中$\bar{\mathbf{x}}$取样于实际分布$\hat{p}_{X_{j}}&#x3D;\frac{1}{N_{u}}\sum_{i&#x3D;N_{l}+1}^{N_{l}+N_{u}}\delta(x_{j}&#x3D;x_{i,j})$<br>接下来，作者将预测原数据的过程分为两步：1. 预测哪个特征被遮掩；2. 预测被遮掩的特征。前者输入嵌入，输出$\hat{\mathbf{m}}$，即预测的遮掩向量；后者输入嵌入，输出$\hat{\mathbf{x}}$，即预测的原特征。最后计算$l_{m}(\mathbf{m},\hat{\mathbf{m}})$与$l_{r}(\mathbf{x},\hat{\mathbf{x}})$作为损失函数进行反向传播。</p><h2 id="半监督学习"><a href="#半监督学习" class="headerlink" title="半监督学习"></a>半监督学习</h2><p>监督学习部分与普通的监督学习相同：做出预测后计算与真实标签的loss并反向传播。<br>对于自监督学习，作者使用了<strong>一致性正则化</strong>：鼓励预测模型在输入被干扰的情况下，依旧返回相似的输出分布。如果使用相对严谨的数学语言，描述如下：<br>$$<br>\mathcal{L}_{u}&#x3D;\mathbb{E}_{\mathbf{x}\sim p_{X}, \mathbf{m}\sim p_{\mathbf{m}},\bar{\mathbf{x}}\sim g_{m}(\mathbf{x},\mathbf{m})}[(f_{e}(\tilde{\mathbf{x}})-f_{e}(\mathbf{x}))^2]<br>$$<br>其中$f_{e}&#x3D;f\circ e$，即预测函数；$\tilde{\mathbf{x}}$为被污染的数据；$\mathbf{x}$为原始数据。也就是说，自监督损失函数是需要保证污染后数据的预测结果和污染前数据的预测结果一致。</p><hr><p>Cover image icon by <a href="https://www.flaticon.com/free-icons/inference" title="inference icons">Dewi Sari</a> from <a href="https://www.flaticon.com/free-icons/inference" title="inference icons">Flaticon</a></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 机器学习 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 深度学习 </tag>
+            
+            <tag> 论文阅读 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>TabTransformer论文速读(2020)</title>
       <link href="/2025/08/07/TabTransformer/"/>
       <url>/2025/08/07/TabTransformer/</url>
       
