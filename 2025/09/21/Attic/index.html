@@ -1,0 +1,219 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Attic速读(ICLR under review, 2025) | Evanescence's Blog</title><meta name="author" content="Henry"><meta name="copyright" content="Henry"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="ffffff"><meta name="description" content="作者在TabPFN的基础上作出了一个改进，准确率相较于TabPFN有相对较大的提升。相较于TabPFN对每个样本给出一个token，Attic选择将样本中每个特征均给出一个token，这在一定程度上解决了TabPFN所出现的“特征顺序不变性”的问题，提升了表格深度学习模型表现。 要点速递 Cell Tokens：即对于每个样本的每个特征均给出一个tokens，该想法并非作者独创，于SAINT(20">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Attic速读(ICLR under review, 2025)">
+<meta property="og:url" content="http://evanescence0515.github.io/2025/09/21/Attic/index.html">
+<meta property="og:site_name" content="Evanescence&#39;s Blog">
+<meta property="og:description" content="作者在TabPFN的基础上作出了一个改进，准确率相较于TabPFN有相对较大的提升。相较于TabPFN对每个样本给出一个token，Attic选择将样本中每个特征均给出一个token，这在一定程度上解决了TabPFN所出现的“特征顺序不变性”的问题，提升了表格深度学习模型表现。 要点速递 Cell Tokens：即对于每个样本的每个特征均给出一个tokens，该想法并非作者独创，于SAINT(20">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://evanescence0515.github.io/img/epidemic_pic.png">
+<meta property="article:published_time" content="2025-09-21T10:58:01.000Z">
+<meta property="article:modified_time" content="2025-09-21T10:58:01.000Z">
+<meta property="article:author" content="Henry">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://evanescence0515.github.io/img/epidemic_pic.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Attic速读(ICLR under review, 2025)",
+  "url": "http://evanescence0515.github.io/2025/09/21/Attic/",
+  "image": "http://evanescence0515.github.io/img/epidemic_pic.png",
+  "datePublished": "2025-09-21T10:58:01.000Z",
+  "dateModified": "2025-09-21T10:58:01.000Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Henry",
+      "url": "http://evanescence0515.github.io"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://evanescence0515.github.io/2025/09/21/Attic/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', 'ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"未找到符合您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Attic速读(ICLR under review, 2025)',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg" style="background-color: #EEEEEE;"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/my_icon.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">27</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">7</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">3</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> List</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/tools/"><i class="fa-fw fas fa-tools"></i><span> Tools</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/epidemic_pic.png);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Evanescence's Blog</span></a><a class="nav-page-title" href="/"><span class="site-name">Attic速读(ICLR under review, 2025)</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> List</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/tools/"><i class="fa-fw fas fa-tools"></i><span> Tools</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">Attic速读(ICLR under review, 2025)</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-09-21T10:58:01.000Z" title="发表于 2025-09-21 18:58:01">2025-09-21</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-09-21T10:58:01.000Z" title="更新于 2025-09-21 18:58:01">2025-09-21</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><p>作者在TabPFN的基础上作出了一个改进，准确率相较于TabPFN有相对较大的提升。相较于TabPFN对每个样本给出一个token，Attic选择将样本中每个特征均给出一个token，这在一定程度上解决了TabPFN所出现的“特征顺序不变性”的问题，提升了表格深度学习模型表现。</p>
+<h1 id="要点速递"><a href="#要点速递" class="headerlink" title="要点速递"></a>要点速递</h1><ol>
+<li><strong>Cell Tokens</strong>：即对于每个样本的每个特征均给出一个tokens，该想法并非作者独创，于<em>SAINT</em>(2021, NeurIPS Workshop)中便提及并使用，同时对于每个特征给出tokens(FT-Transformer, 2021, NeurIPS)和对于每个样本(TabPFN, 2023, ICLR)给出tokens的想法也均在之前的论文中提出并实践。但是并没有哪个方法格外优秀，这次作者的尝试证明使用单元格级别的tokens可以更加有效捕捉合成数据的相关性。</li>
+<li><strong>模型精度</strong>：作者尝试选用float16取代bfloat16，但是在预训练中失败了。float16代表更高精度和更小的范围，而bfloat16有精度较低而范围大。作者选择float16的原因很简单，高精度模型的测试确实准确率更高，但是却在实践过程中预训练失败。</li>
+<li><strong>Flash Attention</strong>：作者使用Flash Attention以减少Attic使用的计算资源与内存占用。并且使用实验证明Flash Attention的使用并未影响最终准确率。Flash Attention是一种高效实现 Transformer 中 <strong>注意力机制（Attention）</strong> 的方法，专门设计用于解决标准 attention 在计算资源和内存占用上的瓶颈问题。它首次出现在 2022 年的论文中：<strong>“FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness”</strong>   。FlashAttention 主要有三个核心优化： <strong>Fused kernel（融合操作）</strong> 将多步操作（比如计算 softmax、dropout、乘法）合并为一个 kernel，减少内存访问。<strong>Block-wise attention</strong> 将 attention 分块处理（比如以 64 行一组），每次只在 GPU 中加载小块，从而避免中间结果写入&#x2F;读取显存。<strong>Recomputation-free</strong> 通过 clever rearrangement 避免需要在反向传播中重新计算或缓存中间变量，节省显存。</li>
+</ol>
+<h1 id="Methodology"><a href="#Methodology" class="headerlink" title="Methodology"></a>Methodology</h1><p>作者使用TabPFN数据集生成器和树数据集生成器来合成数据并预训练。微调则是采用真实世界数据进行。</p>
+<h2 id="Architecture"><a href="#Architecture" class="headerlink" title="Architecture"></a>Architecture</h2><p>作者介绍了<em>Attic</em>，一个基于单元格tokens的ICL-Transformer。与TabPFN不同的核心点在于：Attic使用单元格tokens，其可以表示每个样本的每个特征；而TabPFN则使用样本tokens，即一个token代表所有的特征。<br>$x_{ij}\in \mathbb{R}$代表样本 i 的特征 j 。Attic将该样本嵌入为$h_{ij}\in \mathbb{R}^d$，该tokens经过L层，每层包括一个样本注意力层、一个特征注意力层、两层MLP，每层前均进行一次层归一化。MLP层有2个线性层，隐藏层节点数为5d，层内有GeLU激活函数，模型的最终层将$y_{Q}$独立并将其映射为类别，类别在所有的ICL-Transformer中均为10类。<br>样本注意力将样本维度作为序列并将特征维度作为批次维度，特征注意力则相反。样本注意力机制使用一个掩码来保证查询集中的样本不能看到另外的样本。这种注意力机制来自于TabPFN，用于避免测试集中的相互独立。<br>相较于TabPFN将$x_{i}\in \mathbb{R}^k$转化为$h_{i}\in \mathbb{R}^d$，Attic的内存消耗将增加为k倍，同时，TabPFN将标签转化为浮点向量，而Attic则将其作为一个单词嵌入为tokens。<br>下图简单展示模型的训练时间，可以作为参考：<br><img src="/2025/09/21/Attic/modelcompare.png" alt="modelcompare" title="modelcompare"></p>
+<h2 id="Motivation"><a href="#Motivation" class="headerlink" title="Motivation"></a>Motivation</h2><p>作者认为：该模型由于TabPFN的原因在于：TabPFN模型并未很好的实现特征先后顺序的无关，而Attic所使用的单元格tokens让模型对所有特征一视同仁，TabPFN则是给每个特征一个固定的位置，进而阻止其学习到特征所处位置与特征的关系。</p>
+<h1 id="Experiments"><a href="#Experiments" class="headerlink" title="Experiments"></a>Experiments</h1><p>实验参数与结果参考Table.1<br>实验结果证明Attic准确率在</p>
+<h2 id="Mixed-Precision-Training"><a href="#Mixed-Precision-Training" class="headerlink" title="Mixed-Precision Training"></a>Mixed-Precision Training</h2><p>作者使用float16与bfloat16，发现float16训练过程中极易发生模型的奔溃，所以并未使用精度更高的float16，而是使用bfloat16。</p>
+<h2 id="Regression"><a href="#Regression" class="headerlink" title="Regression"></a>Regression</h2><p>作者后续进行了回归任务的训练，Attic在回归任务上，准确率接近于分类，虽然并未超越Attic分类的效果，但是其依旧为最佳的回归模型。</p>
+<hr>
+
+<p>Cover image icon by <a target="_blank" rel="noopener" href="https://www.flaticon.com/free-icons/inference" title="inference icons">Dewi Sari</a> from <a target="_blank" rel="noopener" href="https://www.flaticon.com/free-icons/inference" title="inference icons">Flaticon</a></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://evanescence0515.github.io">Henry</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://evanescence0515.github.io/2025/09/21/Attic/">http://evanescence0515.github.io/2025/09/21/Attic/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="http://evanescence0515.github.io" target="_blank">Evanescence's Blog</a>！</span></div></div><div class="tag_share"><div class="post-share"><div class="social-share" data-image="/img/epidemic_pic.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related full-width" href="/2025/09/21/Mitra/" title="Mitra博客阅读"><img class="cover" src="/img/deeplearning_pic.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">Mitra博客阅读</div></div><div class="info-2"><div class="info-item-1">该文章参考Amazon science上博客Mitra: Mixed synthetic priors for enhancing tabular foundation models书写。这篇博客精练而深刻，提出了多条有价值的看法，可供后续科研参考(尤其是表格数据领域)。 TFMsTFMs，Tabular Foundation Models，受大语言模型启发，是希望训练一个通用语言模型，其可以在给出一定样本的条件下便可适应特定任务，例如ICL(上下文学习)。TFMs包括TabPFN, Mitra。TabPFN便是其TFMs的一个代表，其第一个版本发表于2023ICLR会议，当时准确率其实并不及传统的表格深度学习模型，但是在2025提出的v2模型一举刊登于Nature，测试效果完全超越v1，由于时间问题，近2年的深度学习模型并没有完全列举于原文，但是实测效果确实极其优秀。TabPFNv2证明了在表格领域内，使用合成的数据训练出的模型效果可以达到SOTA。但是合成数据训练的模型为何可达到超越传统使用无监督数据预训练后微调的深度表格数据？该博客中便有解释。 Synthetic data...</div></div></div></a></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/my_icon.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Henry</div><div class="author-info-description">至此鲜花赠自己，纵马踏花向自由</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">27</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">7</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">3</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/evanescence0515"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/evanescence0515" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:evanescence0515@gmail.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">你好呀，这里是Evanescence的博客，  我会经常分享一些学习统计学、生物信息学、机器学习和计算机技术的心得和笔记。</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%A6%81%E7%82%B9%E9%80%9F%E9%80%92"><span class="toc-number">1.</span> <span class="toc-text">要点速递</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Methodology"><span class="toc-number">2.</span> <span class="toc-text">Methodology</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Architecture"><span class="toc-number">2.1.</span> <span class="toc-text">Architecture</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Motivation"><span class="toc-number">2.2.</span> <span class="toc-text">Motivation</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Experiments"><span class="toc-number">3.</span> <span class="toc-text">Experiments</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Mixed-Precision-Training"><span class="toc-number">3.1.</span> <span class="toc-text">Mixed-Precision Training</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Regression"><span class="toc-number">3.2.</span> <span class="toc-text">Regression</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2025/09/21/Attic/" title="Attic速读(ICLR under review, 2025)"><img src="/img/epidemic_pic.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Attic速读(ICLR under review, 2025)"/></a><div class="content"><a class="title" href="/2025/09/21/Attic/" title="Attic速读(ICLR under review, 2025)">Attic速读(ICLR under review, 2025)</a><time datetime="2025-09-21T10:58:01.000Z" title="发表于 2025-09-21 18:58:01">2025-09-21</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/09/21/Mitra/" title="Mitra博客阅读"><img src="/img/deeplearning_pic.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Mitra博客阅读"/></a><div class="content"><a class="title" href="/2025/09/21/Mitra/" title="Mitra博客阅读">Mitra博客阅读</a><time datetime="2025-09-21T10:54:16.000Z" title="发表于 2025-09-21 18:54:16">2025-09-21</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/09/21/LFR/" title="LFR论文速读(ICLR, 2024)"><img src="/img/deeplearning_pic.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="LFR论文速读(ICLR, 2024)"/></a><div class="content"><a class="title" href="/2025/09/21/LFR/" title="LFR论文速读(ICLR, 2024)">LFR论文速读(ICLR, 2024)</a><time datetime="2025-09-21T10:47:22.000Z" title="发表于 2025-09-21 18:47:22">2025-09-21</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/08/14/STUNT/" title="STUNT论文速读(ICLR, 2023)"><img src="/img/deeplearning_pic.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="STUNT论文速读(ICLR, 2023)"/></a><div class="content"><a class="title" href="/2025/08/14/STUNT/" title="STUNT论文速读(ICLR, 2023)">STUNT论文速读(ICLR, 2023)</a><time datetime="2025-08-14T15:24:41.000Z" title="发表于 2025-08-14 23:24:41">2025-08-14</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/08/11/SwitchTab/" title="SwitchTab论文速读(AAAI, 2024)"><img src="/img/deeplearning_pic.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="SwitchTab论文速读(AAAI, 2024)"/></a><div class="content"><a class="title" href="/2025/08/11/SwitchTab/" title="SwitchTab论文速读(AAAI, 2024)">SwitchTab论文速读(AAAI, 2024)</a><time datetime="2025-08-11T15:06:32.000Z" title="发表于 2025-08-11 23:06:32">2025-08-11</time></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;2019 - 2025 By Henry</span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"><script>(() => {
+  const loadMathjax = () => {
+    if (!window.MathJax) {
+      window.MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']],
+          tags: 'none',
+        },
+        chtml: {
+          scale: 1.1
+        },
+        options: {
+          enableMenu: true,
+          renderActions: {
+            findScript: [10, doc => {
+              for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+                const display = !!node.type.match(/; *mode=display/)
+                const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display)
+                const text = document.createTextNode('')
+                node.parentNode.replaceChild(text, node)
+                math.start = {node: text, delim: '', n: 0}
+                math.end = {node: text, delim: '', n: 0}
+                doc.math.push(math)
+              }
+            }, '']
+          }
+        }
+      }
+
+      const script = document.createElement('script')
+      script.src = 'https://cdn.jsdelivr.net/npm/mathjax/es5/tex-mml-chtml.min.js'
+      script.id = 'MathJax-script'
+      script.async = true
+      document.head.appendChild(script)
+    } else {
+      MathJax.startup.document.state(0)
+      MathJax.texReset()
+      MathJax.typesetPromise()
+    }
+  }
+
+  btf.addGlobalFn('encrypt', loadMathjax, 'mathjax')
+  window.pjax ? loadMathjax() : window.addEventListener('load', loadMathjax)
+})()</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索内容..." type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div></body></html>
