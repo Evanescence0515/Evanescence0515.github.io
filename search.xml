@@ -4,6 +4,33 @@
   
     
     <entry>
+      <title>TabM论文速读(ICLR, 2025)</title>
+      <link href="/2025/10/24/Tabm/"/>
+      <url>/2025/10/24/Tabm/</url>
+      
+        <content type="html"><![CDATA[<p><a href="https://arxiv.org/abs/2410.24210">TabM: Advancing Tabular Deep Learning With Parameter-Efficient Ensembling” (ICLR 2025)</a>有<a href="https://github.com/yandex-research/tabm/">源码</a><br>目前的表格深度学习SOTA(2025)</p><p>主要贡献：</p><ol><li><em>TabM</em>一个简单的深度表格学习框架，其基于MLP和与BatchEnsemble紧密相关的参数高效的集成方法。TabM对于每个样本将会产生多个预测结果。TabM可以与GBDT竞争并且超过了之前的表格深度模型，并且比基于注意力和检索的深度学习模型更加高效</li><li>我们提出了4个评价指标：表现排名、表现评分分布、训练实践、推理吞吐量。作者发现MLP，包括TabM达到了效率和效果之间的均衡，这对于基于注意力和检索的模型来说并非如此。</li><li>作者发现TabM的高效主要源自两个主要原因：1. 底层隐式的MLP集体训练；2. 权重共享。同时作者也发现，对于有多种预测结果的任务，TabM相对薄弱且容易过拟合。</li></ol><h1 id="TabM"><a href="#TabM" class="headerlink" title="TabM"></a>TabM</h1><p>在这一部分，作者展示了TabM</p><h2 id="PRELIMINARIES"><a href="#PRELIMINARIES" class="headerlink" title="PRELIMINARIES"></a>PRELIMINARIES</h2><h3 id="符号表示"><a href="#符号表示" class="headerlink" title="符号表示"></a>符号表示</h3><p>N代表depth，即块的数目；d代表width，即潜在表示的维度。$d_{y}\in \mathbb{N}$代表输出的表示维度，1代表回归问题，对于分类问题则等于类别数。</p><h3 id="数据集"><a href="#数据集" class="headerlink" title="数据集"></a>数据集</h3><p>作者包括了在之前的工作中的46个公用数据集，其中需要额外注意的是：TabRed，这个按照领域进行划分数据集的8个数据集，该数据用于研究时间漂移(temporal shift)，故划分依赖于时间。<br>实验中，作者在每个数据集中使用验证集进行调参，然后在多个随机种子下进行从头训练，并对训练集的测试结果取均值得到最终的模型结果。<br>结果展示，回归问题使用RMSE，分类采用ROC-AUC，有时也会使用相对提升率。在计算相对于MLP的提升率时，用$R^2$代替RMSE</p><h2 id="批集成-BatchEnsemble-的简单介绍"><a href="#批集成-BatchEnsemble-的简单介绍" class="headerlink" title="批集成(BatchEnsemble)的简单介绍"></a>批集成(BatchEnsemble)的简单介绍</h2><p>给出一个架构，考虑其中一个线性层$l(x)&#x3D;Wx+b$，其中$x\in \mathbb{R}^{d_{1}},W\in \mathbb{R}^{d_{2}\times d_{1}},b\in \mathbb{R}^{d_{2}}$，为了简化模型，我们让$d_{1}&#x3D;d_{2}&#x3D;d$。在一个传统的深度集成中，第i个模型有自己的参数$l_{i}(x_{i})&#x3D;W_{i}x_{i}+b_{i}$，其中$x_{i}$代表第i个模型的表示。与之相反的，在批集成中，线性层要么在所有模型间共享，要么大部分共享：$l_{i}(x_{i})&#x3D;s_{i}\odot (W(r_{i}\odot x_{i}))+b_{i}$其中W在所有模型中共享，$r_{i}, s_{i}, b_{i}\in \mathbb{R}^d$在不同模型中并非共享，这与$W_{i}&#x3D;W\odot(s_{i}r_{i}^T)$的定义等价(可私下证明)，为了确保集成模型的模型多样性，所有r, s均使用$\pm 1$初始化，其余所有层均在所有模型共享。<br>上面这种参数化允许将所有的集成模型打包为一个模型，并将k个样本作为输入，并同时运行k个潜在的模型，而不需要构造所有的模型的W。这是通过将1个或多个初始的线性层替换为BatchEnsemble版本来实现，$l_{BE}(X)&#x3D;((X\odot R)W)\odot S+B$，其中$X\in \mathbb{R}^{k\times d}$存储了k样本表示，每个样本表示给一个模型输入，$R,S,B\in \mathbb{R}^d$存储了非共享的参数。</p><h3 id="术语介绍"><a href="#术语介绍" class="headerlink" title="术语介绍"></a>术语介绍</h3><p>隐式子模型，submodel, implicit submodel：每个ensemble成员自己的$r,s,b$或者他们拼接出的矩阵$R,S,B$<br>模型大小的开销：每增加一个模型，只需要增加3d个参数<br>运行时开销：原本需要运行k次前向传播，而现在大部分模型共享权重，所以远小于k倍的前向传播。</p><h2 id="ARCHITECTURE"><a href="#ARCHITECTURE" class="headerlink" title="ARCHITECTURE"></a>ARCHITECTURE</h2><p>作者提出多种变种TabM，其中TabM和$\text{TabM}_{\text{mini}}$为最高效的变种，$\text{TabM}_{\text{packed}}$是概念上重要且可能有用的类型。作者采用k&#x3D;32个模型集成，并分析了超参数。<br>MLP：MLP为N个简单的块+线性分类头构成，$\text{MLP}(x)&#x3D;\text{Linear}(\text{Block}_{N}(\dots(\text{Block}_{1}(x))))$其中$\text{Block}_{i}(x)&#x3D;\text{Dropout}(\text{ReLU}(\text{Linear}(x)))$<br>$\text{MLP}^{\times k}&#x3D;\text{MLP+Deep Ensemble}$：传统的k个MLP构成的集成模型。该模型的训练是在验证集上进行调参并在多个MLP上使用多个随机数种子进行训练得到。这个模型准确率已经超越FT-Transformer。<br>上面的方法训练中可能出现每个MLP达到各自的最优解，但是并没有达到最优解，另外，超参数的调试也没考虑到后续的集成。但是TabM模型有效避免了这些问题。<br>$\text{TabM}_{\text{packed}}&#x3D;\text{MLP+Packed-Ensemble}$：同时训练k个模型，这样就可以考虑到全部模型的最优解，且可以考虑到集成算法。<br>$\text{TabM}_{\text{naive}}&#x3D;\text{MLP+BatchEnsemble}$：使用batchensemble，这里的模型架构以及等于TabM。该架构优于packed架构，这可能是由于共享参数对于模型的正则化。<br>$\text{TabM}_{\text{mini}}&#x3D;\text{MLP+MiniEnsemble}$：刚刚讨论的naive模型有3N个adapter(适配器)$R,S,B$在每个N层的模型中，现在让我们考虑第一层的第一个适配器$R$，它的工作可以被认为是将k个样本映射入k个不同的表示空间，该操作在将样本与W混合的操作之前，实验证明，这一层的操作十分重要：首先，我们将它移除，并保持剩余的3N-1个适配器不变。这让TabM表现更差。然后，作者只保留第一个适配器，其余删除，这就是$\text{TabM}_{\text{mini}}$，该模型表现甚至优于$\text{TabM}_{\text{naive}}$。<br>$\text{TabM}&#x3D;\text{MLP+BatchEnsemble+Better initialization}$：作者选择除了第一个适配器之外，其余适配器均被确定性地初始化为1。这让模型既有退化为mini的能力，又有训练为TabM的能力，这个模型效果是最佳的。<br>$\text{Hyperparameters}$：相较于MLP，$TabM$唯一的新参数是k，作者固定其等于32.</p><h2 id="TabM的重要实际修正"><a href="#TabM的重要实际修正" class="headerlink" title="TabM的重要实际修正"></a>TabM的重要实际修正</h2><p>黑桃：共享训练批次。训练样本的次序常常不同，因为不同种子会进行不同的洗牌。对于TabM, X中存有k个不同的训练样本。我们观察到，在训练过程，不同模型上重复使用训练batch并不会造成很大的影响，在实操中，由于更加简单的操作和更高的效率，作者直接选择共享训练批次。<br>十字架：非线性特征嵌入。有提示，作者使用了一个piecewise-linear嵌入(分段线性嵌入)的简单改进版本<br>$\times N$：深度集成。代表N个独立的TabM十字架+mini版本的集成。有提示，证明模型可以通过传统的深度集成提升准确率。</p><h1 id="模型评估"><a href="#模型评估" class="headerlink" title="模型评估"></a>模型评估</h1><p>baselines: MLP, FT-Transformer(FT-T), SAINT, T2G, ExcelFormer(Excel), TabR, ModernNCA(MNCA), GBDT, XGBoost, LightGBM, CatBoost</p><hr><p>Cover image icon by <a href="https://www.flaticon.com/free-icons/inference" title="inference icons">Dewi Sari</a> from <a href="https://www.flaticon.com/free-icons/inference" title="inference icons">Flaticon</a></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 机器学习 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 深度学习 </tag>
+            
+            <tag> 论文阅读 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>TabPFNv2微调研究</title>
       <link href="/2025/10/09/finetuning-TabPFNv2/"/>
       <url>/2025/10/09/finetuning-TabPFNv2/</url>
