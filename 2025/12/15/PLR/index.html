@@ -1,0 +1,223 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>PLR嵌入策略论文速递(NeurIPS, 2022) | Evanescence's Blog</title><meta name="author" content="Henry"><meta name="copyright" content="Henry"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="ffffff"><meta name="description" content="原文地址：OnEmbeddings for Numerical Features in Tabular Deep Learning作者在这篇文章中主要探讨两种构建嵌入模块的不同方法：第一种方法为基于分段线性（PieceWise）的的标量编码；第二种方法使用了周期性的激活函数。作者证明这两种方法相较于传统的线性层和ReLU激活函数。作者同时证明了数值嵌入策略不仅仅对于Transformer架构有利，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PLR嵌入策略论文速递(NeurIPS, 2022)">
+<meta property="og:url" content="http://evanescence0515.github.io/2025/12/15/PLR/index.html">
+<meta property="og:site_name" content="Evanescence&#39;s Blog">
+<meta property="og:description" content="原文地址：OnEmbeddings for Numerical Features in Tabular Deep Learning作者在这篇文章中主要探讨两种构建嵌入模块的不同方法：第一种方法为基于分段线性（PieceWise）的的标量编码；第二种方法使用了周期性的激活函数。作者证明这两种方法相较于传统的线性层和ReLU激活函数。作者同时证明了数值嵌入策略不仅仅对于Transformer架构有利，">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://evanescence0515.github.io/img/deeplearning_pic.png">
+<meta property="article:published_time" content="2025-12-15T10:26:50.000Z">
+<meta property="article:modified_time" content="2025-12-15T10:26:50.000Z">
+<meta property="article:author" content="Henry">
+<meta property="article:tag" content="深度学习">
+<meta property="article:tag" content="论文阅读">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://evanescence0515.github.io/img/deeplearning_pic.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "PLR嵌入策略论文速递(NeurIPS, 2022)",
+  "url": "http://evanescence0515.github.io/2025/12/15/PLR/",
+  "image": "http://evanescence0515.github.io/img/deeplearning_pic.png",
+  "datePublished": "2025-12-15T10:26:50.000Z",
+  "dateModified": "2025-12-15T10:26:50.000Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Henry",
+      "url": "http://evanescence0515.github.io"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://evanescence0515.github.io/2025/12/15/PLR/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', 'ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"未找到符合您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'PLR嵌入策略论文速递(NeurIPS, 2022)',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg" style="background-color: #EEEEEE;"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/my_icon.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">31</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">9</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">3</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> List</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/tools/"><i class="fa-fw fas fa-tools"></i><span> Tools</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/deeplearning_pic.png);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Evanescence's Blog</span></a><a class="nav-page-title" href="/"><span class="site-name">PLR嵌入策略论文速递(NeurIPS, 2022)</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> List</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/tools/"><i class="fa-fw fas fa-tools"></i><span> Tools</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">PLR嵌入策略论文速递(NeurIPS, 2022)</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-12-15T10:26:50.000Z" title="发表于 2025-12-15 18:26:50">2025-12-15</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-12-15T10:26:50.000Z" title="更新于 2025-12-15 18:26:50">2025-12-15</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><p>原文地址：<a target="_blank" rel="noopener" href="https://arxiv.org/pdf/2203.05556">OnEmbeddings for Numerical Features in Tabular Deep Learning</a><br>作者在这篇文章中主要探讨两种构建嵌入模块的不同方法：第一种方法为基于分段线性（PieceWise）的的标量编码；第二种方法使用了周期性的激活函数。作者证明这两种方法相较于传统的线性层和ReLU激活函数。作者同时证明了数值嵌入策略不仅仅对于Transformer架构有利，也对于MLP模型有利，且可以让其能力与基于注意力的模型相匹敌。<br>作者的工作可以简单概括：1. 证明了数值特征的嵌入方法是深度表格领域内一个待研究的领域，即证明了更加具有表示性的嵌入框架可以提供更好的效果；2. 证明了这种嵌入策略的优势不仅仅局限于Transformer架构，同时也可以提升传统架构的效果；3. 实现了SOTA。</p>
+<h1 id="相关工作"><a href="#相关工作" class="headerlink" title="相关工作"></a>相关工作</h1><h2 id="Feature-binning"><a href="#Feature-binning" class="headerlink" title="Feature binning"></a>Feature binning</h2><p>分箱(binning)是一个离散化的策略，其将数值特征转化为类别特征。初始的数值特征就被替换为对应箱的离散的表示。在这篇文章中，作者使用了不同的分箱策略，特别地，作者使用了他们的边来构建一个无损失的初始标量的分段线性表示。最终结果显示，这个简单且解释性强的表示可以在许多表格问题上提供一些潜在的优势。</p>
+<h2 id="Periodic-activations"><a href="#Periodic-activations" class="headerlink" title="Periodic activations"></a>Periodic activations</h2><p>最近，周期性激活函数已成为处理类坐标输入的关键组成部分，而这在许多应用中都是必需的。包括NLP, CV, 潜在神经表示。在作者的工作中，作者证明周期性的激活函数可以被用于构建强而有力的嵌入模块，用于进行数值的嵌入。相较于之前的论文，其中多个维度的成分在传入模型之前便已被混合。作者发现在混合之前进行嵌入是非常重要的。</p>
+<h1 id="数值变量的嵌入"><a href="#数值变量的嵌入" class="headerlink" title="数值变量的嵌入"></a>数值变量的嵌入</h1><p>对于一个有监督的表格数据问题，我们将数据集记作${(x^i,y^j)}^n_{j&#x3D;1}$其中$y^j$代表标签，$x^j&#x3D;(x^{j(num)},x^{j(cat)})$代表样本的特征。</p>
+<h2 id="广义框架"><a href="#广义框架" class="headerlink" title="广义框架"></a>广义框架</h2><p>作者将数值特征的嵌入记为$z_{i}&#x3D;f_{i}((x_{i}^{(num)})))\in \mathbb{R}^{d_{i}}$，其中$f_{i}(x)$为第i个数值特征的嵌入函数；$z_{i}$为第 i 个数值特征的嵌入，$d_{i}$为嵌入的维度。<br>更重要的是，提出的框架意味着所有的数值特征都是独立地计算，值得注意的是$f_{i}$中的参数也需要训练，其中$f_{i}$的参数训练一般独立进行。<br>对于嵌入的使用依赖于不同的模型主干，对于MLP的架构，他们是concat为一个向量，对于基于Transformer的架构，不进行任何的操作而是直接传入嵌入，所以嵌入是由初始的架构决定的。</p>
+<h2 id="Piecewise-linear-encoding"><a href="#Piecewise-linear-encoding" class="headerlink" title="Piecewise linear encoding"></a>Piecewise linear encoding</h2><p>当MLP被认为是一个通用的估计器，但是在实际使用过程中，由于优化的特性，其学习能力具有一定的限制。但是最近Tancik的工作揭示了：改变输入空间将会减轻上面的情况。这个现象推动着作者来检查是否改变初始标量的表示会提升深度表格模型的表现效果。<br>作者的研究思路来自于被广泛使用的独立热编码，其用于表示离散的属性，例如分类特征。我们可以将独热编码作为一种直接使用标量进行表示的对立面，前者具有更高的参数高效性与表示能力。为了证明：是否一个独热编码会给深度学习表格模型带来优势，我们设计了一个连续的替代品。<br>对于第 i 个数值特征，我们可以将其数值范围分为$T^i$个不相交的区间。$B_{1}^i,\dots,B^i_{T}$其中$B^i_{t}&#x3D;[b_{t-1}^i, b_{t}^i)$。这个划分算法是一个很重要的部分，并将在后续进行解释。<br><em>Note: 1. PLE产生了可选择的初始表示，其可以被认为是一种预处理策略，这些表示被计算出来并用于替代初始的标量进行后续的计算；2. 对于T&#x3D;1, PLE可以被认为与标量表示相等价; 3. 与类别特征相反, 数值特征是有序的, 所以对于每个数值x, 比其小的箱将被设置为1, 大于的设置为0, 若该数值落于特定箱内, 则设置为(x-b_{n-1})&#x2F;(b_{n}-b_{n-1}), 这样就可体现出每个特征的有序性. 具体操作方法如下所示:</em><br><img src="/2025/12/15/PLR/ple.png" alt="ple" title="ple"><br>虽然PLE嵌入可以直接传入MLP中，但基于注意力的模型本质上不考虑嵌入的顺序，所以需要再加上一个步骤，也就是加入位置编码。技术上讲，我们观察到在PLE后面放置一个线性层就够了，这个步骤我们有一个语义学上面的解释，也就是说，这个操作类似于给每个箱分配一个可训练的嵌入$v_{t}\in \mathbb{R}^d$并通过将$e_{t}$作为权重，加上加上bias $v_{0}$并聚合得到最终的特征嵌入。</p>
+<h2 id="通过分位数获取分箱"><a href="#通过分位数获取分箱" class="headerlink" title="通过分位数获取分箱"></a>通过分位数获取分箱</h2><p>一个传统的方法就是选择分位数作为分箱的依据。</p>
+<h2 id="Target-aware-bins"><a href="#Target-aware-bins" class="headerlink" title="Target-aware bins"></a>Target-aware bins</h2><p>这是一种有监督的分箱策略，其旨在减少每个箱内的种类数量。就有些类似于决策树中的划分策略。</p>
+<h2 id="周期激活函数"><a href="#周期激活函数" class="headerlink" title="周期激活函数"></a>周期激活函数</h2><p>作者这个想法来自于Tancik的那篇文章（Fourier features let networks learn high frequency functions in low dimensional domains. In NeurIPS, 2020.）。首先，作者考虑到之前嵌入的框架强制要求在嵌入过程中混合特征；其次，作者让这些预激活函数可以训练，而不仅仅是保持不变(Learnable fourier features for multi-dimensional spatial positional encoding. In NeurIPS, 2021.)。<br>$$<br>f_{i}(x)&#x3D;\text{Periodic}(x)&#x3D;\text{concat}[\sin(v), \cos(v)],v&#x3D;[2\pi c_{1}x,\dots, 2\pi c_{k}x]<br>$$<br>其中 $c_{i}$ 是一个可训练的参数，选自于 $\mathcal{N}(0,\sigma)$。其中$\sigma$很重要，所以需要通过验证集进行选择。</p>
+<h2 id="简单的可微分层"><a href="#简单的可微分层" class="headerlink" title="简单的可微分层"></a>简单的可微分层</h2><p>传统方法使用传统的可微分层，例如：线性层、ReLU激活等方法进行数值的嵌入。这些传统的模块也可以用于之前的组分中，而且可以得到更好的效果，也就是后面要提到的PLR.</p>
+<h1 id="实验"><a href="#实验" class="headerlink" title="实验"></a>实验</h1><p>实验中最重要的就是PLR与PLE两种架构，前者代表 Periodic -&gt; Linear -&gt; ReLU, 后者则是上文中提到的Piece-wise linear encoding。<br>作者的研究结果有以下要点：基于既往数值嵌入模块的研究，证明数值嵌入会提高模型准确率，即使是最简单的Linear + ReLU的嵌入方式</p>
+<h2 id="PLE"><a href="#PLE" class="headerlink" title="PLE"></a>PLE</h2><p>PLE的研究结果主要如下：1. PLE总是对于MLP和Transformer架构有效果；2. 在PLE的基础上加入可微分的模块还可以提升准确率，但是这些操作会大大提高运算量。</p>
+<h2 id="Periodic-activation-functions"><a href="#Periodic-activation-functions" class="headerlink" title="Periodic activation functions"></a>Periodic activation functions</h2><p>PLR模型显著提升模型效果，但是再在嵌入模块后面加入更多的线性层并不会提升其准确率。所以考虑到计算代价，作者并没有考虑更多线性层的嵌入。</p>
+<h1 id="Analysis"><a href="#Analysis" class="headerlink" title="Analysis"></a>Analysis</h1><p><img src="/2025/12/15/PLR/size.png" alt="size" title="size"><br>引入嵌入会不可避免地大大增加参数量，但是这些大量的参数量并不会大大提升模型的训练时间，例如CH数据集，近2000倍的参数量只会导致1.5倍的训练时间提升。另外，不同的数据集需要不同的参数量实现准确率的提升。<br>此外，PLR作为一种预处理的策略，也可以有效提高模型准确率：模型在经过PLR的处理后，准确率相较于传统预处理方法有所提升，而相较于带有传统预处理策略的PLR模型准确率接近。<br>特征嵌入可能类似于特征工程，并且似乎适用于各种类型的模型。然而，本文提出的嵌入方案是基于深度学习（DL）训练过程中的特定特性而设计的（见第 3.2 小节和第 3.3 小节中的动机性讨论）。尽管我们的方法可能能够较好地迁移到具有相似训练特性的模型中（例如线性模型，因为线性模型是深度模型的一种特殊情形），但这种迁移在一般情况下并不成立。<br>为说明这一点，我们尝试将 Periodic 模块 应用于 XGBoost，方法是固定公式 (2) 中的随机系数，同时保留原始特征而不将其删除。调参与评估流程与第 4.2 小节中使用的设置保持一致。表 10 的结果表明，这种技术虽然对深度学习模型有效，但并未为 XGBoost 带来任何性能提升。</p>
+<hr>
+
+<p>Cover image icon by <a target="_blank" rel="noopener" href="https://www.flaticon.com/free-icons/inference" title="inference icons">Dewi Sari</a> from <a target="_blank" rel="noopener" href="https://www.flaticon.com/free-icons/inference" title="inference icons">Flaticon</a></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://evanescence0515.github.io">Henry</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://evanescence0515.github.io/2025/12/15/PLR/">http://evanescence0515.github.io/2025/12/15/PLR/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="http://evanescence0515.github.io" target="_blank">Evanescence's Blog</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a><a class="post-meta__tags" href="/tags/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/">论文阅读</a></div><div class="post-share"><div class="social-share" data-image="/img/deeplearning_pic.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related full-width" href="/2025/11/28/GCN-lesson1/" title="torch geometric学习笔记1"><img class="cover" src="/img/deeplearning_pic.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">torch geometric学习笔记1</div></div><div class="info-2"><div class="info-item-1">原教程参考：torch_geometric官方教程 Basic property of dataset123from torch_geometric.datasets import TUDatasetdataset = TUDataset(root=&#x27;D:/data&#x27;, name=&#x27;ENZYMES&#x27;, use_node_attr = True) 上图下载并读取名为”ENZYMES”的数据集，数据集中具体的属性大小与内容如下所示： 12345dataset&gt;&gt;&gt; ENZYMES(600)dataset[0]&gt;&gt;&gt; Data(edge_index=[2, 168], x=[37, 21], y=[1]) “ENZYMES(600)”代表共有600个样本，edge_index代表节点与节点之间的连接关系，同列的两个节点相互连接，有向图代表共有168条边，如果为无向图，则共有168&#x2F;2条边。x代表每个节点的属性，共有37个节点，每个节点有21个特征。y代表图的结果。 Mini-batchesPyG通过将...</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2025/09/21/Attic/" title="Attic速读(ICLR under review, 2025)"><img class="cover" src="/img/deeplearning_pic.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-09-21</div><div class="info-item-2">Attic速读(ICLR under review, 2025)</div></div><div class="info-2"><div class="info-item-1">作者在TabPFN的基础上作出了一个改进，准确率相较于TabPFN有相对较大的提升。相较于TabPFN对每个样本给出一个token，Attic选择将样本中每个特征均给出一个token，这在一定程度上解决了TabPFN所出现的“特征顺序不变性”的问题，提升了表格深度学习模型表现。 要点速递 Cell Tokens：即对于每个样本的每个特征均给出一个tokens，该想法并非作者独创，于SAINT(2021, NeurIPS Workshop)中便提及并使用，同时对于每个特征给出tokens(FT-Transformer, 2021, NeurIPS)和对于每个样本(TabPFN, 2023, ICLR)给出tokens的想法也均在之前的论文中提出并实践。但是并没有哪个方法格外优秀，这次作者的尝试证明使用单元格级别的tokens可以更加有效捕捉合成数据的相关性。 模型精度：作者尝试选用float16取代bfloat16，但是在预训练中失败了。float16代表更高精度和更小的范围，而bfloat16有精度较低而范围大。作者选择float16的原因很简单，高精度模型的测试确实准确率更高，...</div></div></div></a><a class="pagination-related" href="/2025/07/31/AutoPNPNet%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/" title="AutoPNPNet论文阅读"><img class="cover" src="/img/deeplearning_pic.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-07-31</div><div class="info-item-2">AutoPNPNet论文阅读</div></div><div class="info-2"><div class="info-item-1">模型速览 PNPNet(Periodic-Non-Periodic Network)和AutoPNPNet是作者提出的深度学习模型，用于挖掘数据内部的周期性来增强预测准确率。作者提出了FourierNet：一种基于Fourier的神经编码器来捕捉周期性特征；ChebyshevNet：使用Chebyshev神经编码器来建模非周期性特征。作者将这两种架构结合构成PNPNet和AutoPNPNet。模型效果优于SOTA（会有论文不是SOTA的吗？而且这里的SOTA是FT-Transformer(2021, Yury Gorishniy)）。   PNPNet detects periodic and non-periodic features a priori, feeding them into separate branches, while AutoPNPNet automatically selects features through a learned mechanism.   Q1：PNPNet如何使用滤波器与傅里叶变换获取periodic and non-periodi...</div></div></div></a><a class="pagination-related" href="/2025/08/14/STUNT/" title="STUNT论文速读(ICLR, 2023)"><img class="cover" src="/img/deeplearning_pic.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-08-14</div><div class="info-item-2">STUNT论文速读(ICLR, 2023)</div></div><div class="info-2"><div class="info-item-1">STUNT: FEW-SHOT TABULAR LEARNING WITH SELF-GENERATED TASKS FROM UNLABELED TABLES(ICLR, 2023).有源代码。在这偏文章中，作者提出了一种简单但是高效的小样本半监督表格学习框架：Self-generated Tasks from UNlabeled Tables(STUNT)。我们的主要想法是：通过将多个选中的列作为标签自己产生多种小样本任务。然后使用元学习模式通过构建的任务来学习泛化的知识。另外，通过使用STUNT从无标签数据中产生伪验证集，我们引入无监督的验证模式来进行超参数研究。 重点速递这篇文章是一个相对细分的领域：表格数据中的半监督小样本学习(semi-supervised few-shot tabular data learning)。ProtoNet：原型网络，通过计算一个类别的原型(可以是一个类别的均值)。然后计算原型到样本的距离来分类(k-means?)。小样本学习架构：小样本学习一般记作N-way K-shot代表有N个类别，每个类别内有K个样本的情况，例如5-way 1-s...</div></div></div></a><a class="pagination-related" href="/2025/07/09/T2GFormer/" title="T2GFormer"><img class="cover" src="/img/deeplearning_pic.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-07-09</div><div class="info-item-2">T2GFormer</div></div><div class="info-2"><div class="info-item-1">Introduction作者在这篇文章中提出了一种新的特征交互方式。这种方式基于一种新型的图估计器，这种估计器可以自动估计特征之间的关系并通过连接相关特征来构造图像。一种特别的 跨层读取(Cross-level Readout) 收集了通过T2Gformer预测的不同层的突出特征并获取全局信息并作出预测。T2Gformer优于深度神经网络并与非深GBDT能力相近。T2Gformer的优势在于特征交互项的提取，所以作者在引入中便提及：已有的特征选择方法可以被分为“软”与”硬”版本。”软”版本本质上运用特征间的全连接交互项，例如乘法交互项、特征交叉与基于注意力的交互。但是表格特征本质上就带有异质性，所以全连接交互是一个次优的选项因为其盲目地将所有特征融合在一起。DANets使用了”硬”版本，其将相关的特征分组并将交互限制在被分组的特征内，虽然DANets取得了非常有潜力的成果，他的特征选取操作依旧不能解决组内交互的问题，因此同一组的特征被无差别的融合，使得模型表达能力下降。作者设计了Graph Estimator(GE)来组织表格特征为一个特征关联图(FR-Graph)，更进一步的，...</div></div></div></a><a class="pagination-related" href="/2025/08/11/SwitchTab/" title="SwitchTab论文速读(AAAI, 2024)"><img class="cover" src="/img/deeplearning_pic.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-08-11</div><div class="info-item-2">SwitchTab论文速读(AAAI, 2024)</div></div><div class="info-2"><div class="info-item-1">SwitchTab(AAAI, 2024)无源码SwitchTab利用非对称编码器-解码器框架来解耦数据对中相互和独特的特征，并最终获得更加具有代表性的嵌入。这些嵌入推动了一个更加好的决策边界并提高了下游任务的表现效果。另外，预训练的独特的嵌入可以作为“即插即用”的特征在传统分类模型中使用。最后，SwitchTab具有可以通过解耦的相互和独特特征的可视化来产生可解释性的表示。SwitchTab的核心在于：一个非对称的编码器-解码器架构，通过可使特征解耦合的定制映射器进行增广。这个过程从将每个样本编码为一个广义的嵌入，到将其映射为相互的和独有的嵌入。该模型的另一个优点就是它的多面性，其使用了自监督方法训练。这个适应性保证了SwitchTab在多个训练领域内表现优异，不管数据是否有监督。 要点速递原作者无开源代码，模型准确性存疑，但是作者均为Amazon单位，模型最大的创新点在于特征解耦(类似PNPNet，可参考之前推文)。PNPNet主要学习周期性数据中的周期性内容(傅里叶网络)，非周期数据中的非周期内容(切比雪夫网络)；SwitchNet则是对于所有数据均采用相同的提取策略提取共...</div></div></div></a><a class="pagination-related" href="/2025/08/07/TabTransformer/" title="TabTransformer论文速读(2020)"><img class="cover" src="/img/deeplearning_pic.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-08-07</div><div class="info-item-2">TabTransformer论文速读(2020)</div></div><div class="info-2"><div class="info-item-1">TabTransformer是基于Transformer架构构建的表格学习深度模型。它主要将类别变量转化为上下文嵌入，同时发现这样产生的嵌入对于缺失数据具有良好的鲁棒性与可解释性。最后作者提出一种半监督预训练方法。这篇文章发表于2020年，当时的SOTA还是MLP，深度学习还远远比不上树模型，TabTransformer有隐隐赶上树模型的趋势。 重点速递TabTransformer主要在表格数据领域中使用了特殊的预训练流程。MLM：对于数据进行遮掩，然后预测遮掩部分数据来进行预训练。RTD：将部分数据赋予随机值，然后设计二分类分类器来识别随机数据进行预训练。 模型架构TabTransformer包括有一个列嵌入层、N个Tranformer层和一个MLP层。$(\boldsymbol{x},y)$表示一个特征-标签对，其中$\boldsymbol{x}&#x3D;{\boldsymbol{x}_{cat},\boldsymbol{x}_{cont}}$前者代表类别变量$\boldsymbol{x}_\text{cat}&#x3D;{x_{1},x_{2},\dots,x_{m}}$...</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/my_icon.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Henry</div><div class="author-info-description">至此鲜花赠自己，纵马踏花向自由</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">31</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">9</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">3</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/evanescence0515"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/evanescence0515" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:evanescence0515@gmail.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">你好呀，这里是Evanescence的博客，  我会经常分享一些学习统计学、生物信息学、机器学习和计算机技术的心得和笔记。</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%9B%B8%E5%85%B3%E5%B7%A5%E4%BD%9C"><span class="toc-number">1.</span> <span class="toc-text">相关工作</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Feature-binning"><span class="toc-number">1.1.</span> <span class="toc-text">Feature binning</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Periodic-activations"><span class="toc-number">1.2.</span> <span class="toc-text">Periodic activations</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%95%B0%E5%80%BC%E5%8F%98%E9%87%8F%E7%9A%84%E5%B5%8C%E5%85%A5"><span class="toc-number">2.</span> <span class="toc-text">数值变量的嵌入</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B9%BF%E4%B9%89%E6%A1%86%E6%9E%B6"><span class="toc-number">2.1.</span> <span class="toc-text">广义框架</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Piecewise-linear-encoding"><span class="toc-number">2.2.</span> <span class="toc-text">Piecewise linear encoding</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%80%9A%E8%BF%87%E5%88%86%E4%BD%8D%E6%95%B0%E8%8E%B7%E5%8F%96%E5%88%86%E7%AE%B1"><span class="toc-number">2.3.</span> <span class="toc-text">通过分位数获取分箱</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Target-aware-bins"><span class="toc-number">2.4.</span> <span class="toc-text">Target-aware bins</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%91%A8%E6%9C%9F%E6%BF%80%E6%B4%BB%E5%87%BD%E6%95%B0"><span class="toc-number">2.5.</span> <span class="toc-text">周期激活函数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AE%80%E5%8D%95%E7%9A%84%E5%8F%AF%E5%BE%AE%E5%88%86%E5%B1%82"><span class="toc-number">2.6.</span> <span class="toc-text">简单的可微分层</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AE%9E%E9%AA%8C"><span class="toc-number">3.</span> <span class="toc-text">实验</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#PLE"><span class="toc-number">3.1.</span> <span class="toc-text">PLE</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Periodic-activation-functions"><span class="toc-number">3.2.</span> <span class="toc-text">Periodic activation functions</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Analysis"><span class="toc-number">4.</span> <span class="toc-text">Analysis</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2025/12/15/PLR/" title="PLR嵌入策略论文速递(NeurIPS, 2022)"><img src="/img/deeplearning_pic.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="PLR嵌入策略论文速递(NeurIPS, 2022)"/></a><div class="content"><a class="title" href="/2025/12/15/PLR/" title="PLR嵌入策略论文速递(NeurIPS, 2022)">PLR嵌入策略论文速递(NeurIPS, 2022)</a><time datetime="2025-12-15T10:26:50.000Z" title="发表于 2025-12-15 18:26:50">2025-12-15</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/11/28/GCN-lesson1/" title="torch geometric学习笔记1"><img src="/img/deeplearning_pic.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="torch geometric学习笔记1"/></a><div class="content"><a class="title" href="/2025/11/28/GCN-lesson1/" title="torch geometric学习笔记1">torch geometric学习笔记1</a><time datetime="2025-11-28T10:17:02.000Z" title="发表于 2025-11-28 18:17:02">2025-11-28</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/10/24/Tabm/" title="TabM论文速读(ICLR, 2025)"><img src="/img/deeplearning_pic.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="TabM论文速读(ICLR, 2025)"/></a><div class="content"><a class="title" href="/2025/10/24/Tabm/" title="TabM论文速读(ICLR, 2025)">TabM论文速读(ICLR, 2025)</a><time datetime="2025-10-24T15:40:23.000Z" title="发表于 2025-10-24 23:40:23">2025-10-24</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/10/09/finetuning-TabPFNv2/" title="TabPFNv2微调研究"><img src="/img/deeplearning_pic.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="TabPFNv2微调研究"/></a><div class="content"><a class="title" href="/2025/10/09/finetuning-TabPFNv2/" title="TabPFNv2微调研究">TabPFNv2微调研究</a><time datetime="2025-10-09T09:00:14.000Z" title="发表于 2025-10-09 17:00:14">2025-10-09</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/09/21/Attic/" title="Attic速读(ICLR under review, 2025)"><img src="/img/deeplearning_pic.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Attic速读(ICLR under review, 2025)"/></a><div class="content"><a class="title" href="/2025/09/21/Attic/" title="Attic速读(ICLR under review, 2025)">Attic速读(ICLR under review, 2025)</a><time datetime="2025-09-21T10:58:01.000Z" title="发表于 2025-09-21 18:58:01">2025-09-21</time></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;2019 - 2025 By Henry</span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"><script>(() => {
+  const loadMathjax = () => {
+    if (!window.MathJax) {
+      window.MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']],
+          tags: 'none',
+        },
+        chtml: {
+          scale: 1.1
+        },
+        options: {
+          enableMenu: true,
+          renderActions: {
+            findScript: [10, doc => {
+              for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+                const display = !!node.type.match(/; *mode=display/)
+                const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display)
+                const text = document.createTextNode('')
+                node.parentNode.replaceChild(text, node)
+                math.start = {node: text, delim: '', n: 0}
+                math.end = {node: text, delim: '', n: 0}
+                doc.math.push(math)
+              }
+            }, '']
+          }
+        }
+      }
+
+      const script = document.createElement('script')
+      script.src = 'https://cdn.jsdelivr.net/npm/mathjax/es5/tex-mml-chtml.min.js'
+      script.id = 'MathJax-script'
+      script.async = true
+      document.head.appendChild(script)
+    } else {
+      MathJax.startup.document.state(0)
+      MathJax.texReset()
+      MathJax.typesetPromise()
+    }
+  }
+
+  btf.addGlobalFn('encrypt', loadMathjax, 'mathjax')
+  window.pjax ? loadMathjax() : window.addEventListener('load', loadMathjax)
+})()</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索内容..." type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div></body></html>

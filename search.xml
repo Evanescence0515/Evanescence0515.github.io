@@ -4,6 +4,33 @@
   
     
     <entry>
+      <title>PLR嵌入策略论文速递(NeurIPS, 2022)</title>
+      <link href="/2025/12/15/PLR/"/>
+      <url>/2025/12/15/PLR/</url>
+      
+        <content type="html"><![CDATA[<p>原文地址：<a href="https://arxiv.org/pdf/2203.05556">OnEmbeddings for Numerical Features in Tabular Deep Learning</a><br>作者在这篇文章中主要探讨两种构建嵌入模块的不同方法：第一种方法为基于分段线性（PieceWise）的的标量编码；第二种方法使用了周期性的激活函数。作者证明这两种方法相较于传统的线性层和ReLU激活函数。作者同时证明了数值嵌入策略不仅仅对于Transformer架构有利，也对于MLP模型有利，且可以让其能力与基于注意力的模型相匹敌。<br>作者的工作可以简单概括：1. 证明了数值特征的嵌入方法是深度表格领域内一个待研究的领域，即证明了更加具有表示性的嵌入框架可以提供更好的效果；2. 证明了这种嵌入策略的优势不仅仅局限于Transformer架构，同时也可以提升传统架构的效果；3. 实现了SOTA。</p><h1 id="相关工作"><a href="#相关工作" class="headerlink" title="相关工作"></a>相关工作</h1><h2 id="Feature-binning"><a href="#Feature-binning" class="headerlink" title="Feature binning"></a>Feature binning</h2><p>分箱(binning)是一个离散化的策略，其将数值特征转化为类别特征。初始的数值特征就被替换为对应箱的离散的表示。在这篇文章中，作者使用了不同的分箱策略，特别地，作者使用了他们的边来构建一个无损失的初始标量的分段线性表示。最终结果显示，这个简单且解释性强的表示可以在许多表格问题上提供一些潜在的优势。</p><h2 id="Periodic-activations"><a href="#Periodic-activations" class="headerlink" title="Periodic activations"></a>Periodic activations</h2><p>最近，周期性激活函数已成为处理类坐标输入的关键组成部分，而这在许多应用中都是必需的。包括NLP, CV, 潜在神经表示。在作者的工作中，作者证明周期性的激活函数可以被用于构建强而有力的嵌入模块，用于进行数值的嵌入。相较于之前的论文，其中多个维度的成分在传入模型之前便已被混合。作者发现在混合之前进行嵌入是非常重要的。</p><h1 id="数值变量的嵌入"><a href="#数值变量的嵌入" class="headerlink" title="数值变量的嵌入"></a>数值变量的嵌入</h1><p>对于一个有监督的表格数据问题，我们将数据集记作${(x^i,y^j)}^n_{j&#x3D;1}$其中$y^j$代表标签，$x^j&#x3D;(x^{j(num)},x^{j(cat)})$代表样本的特征。</p><h2 id="广义框架"><a href="#广义框架" class="headerlink" title="广义框架"></a>广义框架</h2><p>作者将数值特征的嵌入记为$z_{i}&#x3D;f_{i}((x_{i}^{(num)})))\in \mathbb{R}^{d_{i}}$，其中$f_{i}(x)$为第i个数值特征的嵌入函数；$z_{i}$为第 i 个数值特征的嵌入，$d_{i}$为嵌入的维度。<br>更重要的是，提出的框架意味着所有的数值特征都是独立地计算，值得注意的是$f_{i}$中的参数也需要训练，其中$f_{i}$的参数训练一般独立进行。<br>对于嵌入的使用依赖于不同的模型主干，对于MLP的架构，他们是concat为一个向量，对于基于Transformer的架构，不进行任何的操作而是直接传入嵌入，所以嵌入是由初始的架构决定的。</p><h2 id="Piecewise-linear-encoding"><a href="#Piecewise-linear-encoding" class="headerlink" title="Piecewise linear encoding"></a>Piecewise linear encoding</h2><p>当MLP被认为是一个通用的估计器，但是在实际使用过程中，由于优化的特性，其学习能力具有一定的限制。但是最近Tancik的工作揭示了：改变输入空间将会减轻上面的情况。这个现象推动着作者来检查是否改变初始标量的表示会提升深度表格模型的表现效果。<br>作者的研究思路来自于被广泛使用的独立热编码，其用于表示离散的属性，例如分类特征。我们可以将独热编码作为一种直接使用标量进行表示的对立面，前者具有更高的参数高效性与表示能力。为了证明：是否一个独热编码会给深度学习表格模型带来优势，我们设计了一个连续的替代品。<br>对于第 i 个数值特征，我们可以将其数值范围分为$T^i$个不相交的区间。$B_{1}^i,\dots,B^i_{T}$其中$B^i_{t}&#x3D;[b_{t-1}^i, b_{t}^i)$。这个划分算法是一个很重要的部分，并将在后续进行解释。<br><em>Note: 1. PLE产生了可选择的初始表示，其可以被认为是一种预处理策略，这些表示被计算出来并用于替代初始的标量进行后续的计算；2. 对于T&#x3D;1, PLE可以被认为与标量表示相等价; 3. 与类别特征相反, 数值特征是有序的, 所以对于每个数值x, 比其小的箱将被设置为1, 大于的设置为0, 若该数值落于特定箱内, 则设置为(x-b_{n-1})&#x2F;(b_{n}-b_{n-1}), 这样就可体现出每个特征的有序性. 具体操作方法如下所示:</em><br><img src="/2025/12/15/PLR/ple.png" alt="ple" title="ple"><br>虽然PLE嵌入可以直接传入MLP中，但基于注意力的模型本质上不考虑嵌入的顺序，所以需要再加上一个步骤，也就是加入位置编码。技术上讲，我们观察到在PLE后面放置一个线性层就够了，这个步骤我们有一个语义学上面的解释，也就是说，这个操作类似于给每个箱分配一个可训练的嵌入$v_{t}\in \mathbb{R}^d$并通过将$e_{t}$作为权重，加上加上bias $v_{0}$并聚合得到最终的特征嵌入。</p><h2 id="通过分位数获取分箱"><a href="#通过分位数获取分箱" class="headerlink" title="通过分位数获取分箱"></a>通过分位数获取分箱</h2><p>一个传统的方法就是选择分位数作为分箱的依据。</p><h2 id="Target-aware-bins"><a href="#Target-aware-bins" class="headerlink" title="Target-aware bins"></a>Target-aware bins</h2><p>这是一种有监督的分箱策略，其旨在减少每个箱内的种类数量。就有些类似于决策树中的划分策略。</p><h2 id="周期激活函数"><a href="#周期激活函数" class="headerlink" title="周期激活函数"></a>周期激活函数</h2><p>作者这个想法来自于Tancik的那篇文章（Fourier features let networks learn high frequency functions in low dimensional domains. In NeurIPS, 2020.）。首先，作者考虑到之前嵌入的框架强制要求在嵌入过程中混合特征；其次，作者让这些预激活函数可以训练，而不仅仅是保持不变(Learnable fourier features for multi-dimensional spatial positional encoding. In NeurIPS, 2021.)。<br>$$<br>f_{i}(x)&#x3D;\text{Periodic}(x)&#x3D;\text{concat}[\sin(v), \cos(v)],v&#x3D;[2\pi c_{1}x,\dots, 2\pi c_{k}x]<br>$$<br>其中 $c_{i}$ 是一个可训练的参数，选自于 $\mathcal{N}(0,\sigma)$。其中$\sigma$很重要，所以需要通过验证集进行选择。</p><h2 id="简单的可微分层"><a href="#简单的可微分层" class="headerlink" title="简单的可微分层"></a>简单的可微分层</h2><p>传统方法使用传统的可微分层，例如：线性层、ReLU激活等方法进行数值的嵌入。这些传统的模块也可以用于之前的组分中，而且可以得到更好的效果，也就是后面要提到的PLR.</p><h1 id="实验"><a href="#实验" class="headerlink" title="实验"></a>实验</h1><p>实验中最重要的就是PLR与PLE两种架构，前者代表 Periodic -&gt; Linear -&gt; ReLU, 后者则是上文中提到的Piece-wise linear encoding。<br>作者的研究结果有以下要点：基于既往数值嵌入模块的研究，证明数值嵌入会提高模型准确率，即使是最简单的Linear + ReLU的嵌入方式</p><h2 id="PLE"><a href="#PLE" class="headerlink" title="PLE"></a>PLE</h2><p>PLE的研究结果主要如下：1. PLE总是对于MLP和Transformer架构有效果；2. 在PLE的基础上加入可微分的模块还可以提升准确率，但是这些操作会大大提高运算量。</p><h2 id="Periodic-activation-functions"><a href="#Periodic-activation-functions" class="headerlink" title="Periodic activation functions"></a>Periodic activation functions</h2><p>PLR模型显著提升模型效果，但是再在嵌入模块后面加入更多的线性层并不会提升其准确率。所以考虑到计算代价，作者并没有考虑更多线性层的嵌入。</p><h1 id="Analysis"><a href="#Analysis" class="headerlink" title="Analysis"></a>Analysis</h1><p><img src="/2025/12/15/PLR/size.png" alt="size" title="size"><br>引入嵌入会不可避免地大大增加参数量，但是这些大量的参数量并不会大大提升模型的训练时间，例如CH数据集，近2000倍的参数量只会导致1.5倍的训练时间提升。另外，不同的数据集需要不同的参数量实现准确率的提升。<br>此外，PLR作为一种预处理的策略，也可以有效提高模型准确率：模型在经过PLR的处理后，准确率相较于传统预处理方法有所提升，而相较于带有传统预处理策略的PLR模型准确率接近。<br>特征嵌入可能类似于特征工程，并且似乎适用于各种类型的模型。然而，本文提出的嵌入方案是基于深度学习（DL）训练过程中的特定特性而设计的（见第 3.2 小节和第 3.3 小节中的动机性讨论）。尽管我们的方法可能能够较好地迁移到具有相似训练特性的模型中（例如线性模型，因为线性模型是深度模型的一种特殊情形），但这种迁移在一般情况下并不成立。<br>为说明这一点，我们尝试将 Periodic 模块 应用于 XGBoost，方法是固定公式 (2) 中的随机系数，同时保留原始特征而不将其删除。调参与评估流程与第 4.2 小节中使用的设置保持一致。表 10 的结果表明，这种技术虽然对深度学习模型有效，但并未为 XGBoost 带来任何性能提升。</p><hr><p>Cover image icon by <a href="https://www.flaticon.com/free-icons/inference" title="inference icons">Dewi Sari</a> from <a href="https://www.flaticon.com/free-icons/inference" title="inference icons">Flaticon</a></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 机器学习 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 深度学习 </tag>
+            
+            <tag> 论文阅读 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>torch geometric学习笔记1</title>
       <link href="/2025/11/28/GCN-lesson1/"/>
       <url>/2025/11/28/GCN-lesson1/</url>
