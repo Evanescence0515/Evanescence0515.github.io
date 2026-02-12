@@ -4,6 +4,35 @@
   
     
     <entry>
+      <title>TimesNet(ICLR, 2023)</title>
+      <link href="/2026/02/12/TimesNet/"/>
+      <url>/2026/02/12/TimesNet/</url>
+      
+        <content type="html"><![CDATA[<h1 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h1><p>为了解决1D时间序列在已有研究中展现出的限制，将其拓展到2D空间，作者基于多种周期将1D的时间序列转化为一系列2D的张量。这种转化可以将周期之间和周期内部的多样性嵌入为2D张量对应的行和列，让2D多样性可以被2D核函数更加容易地建模。技术上来说，作者提出了TimesNet和TimesBlock作为骨架。TimesBlock可以适应性地发现多周期性并使用一系列高参数效率(parameter-efficient)的Inception模块从2D图像中提取复杂的时间多样性。</p><h1 id="名词"><a href="#名词" class="headerlink" title="名词"></a>名词</h1><ol><li>intraperiod-variation, interperiod-variation: 前者代表一个周期内的短期时间特征、后者代表不同周期内的长期特征。</li><li>TimesBlock: 将1D时间序列基于学习到的周期转化为一组2D张量并使用一个Inception模块进一步捕捉周期间和周期内的多样性。</li></ol><h1 id="TimesNet"><a href="#TimesNet" class="headerlink" title="TimesNet"></a>TimesNet</h1><h2 id="Transform-1D-Variations-into-2D-Variations"><a href="#Transform-1D-Variations-into-2D-Variations" class="headerlink" title="Transform 1D-Variations into 2D-Variations"></a>Transform 1D-Variations into 2D-Variations</h2><p>对于长度为T，具有C个维度的类别的时间序列，初始1D状态为$\mathbf{X}_{1D}\in \mathbb{R}^{T\times C}$，为了表示周期之间的多样性，首先需要发现周期。技术上来说，作者采用FFT来分析了时间序列在时域上的特征：<br>$$<br>\mathbf{A}&#x3D;\text{Avg}(\text{Amp}(\text{FFT}(\mathbf{X}_{1D}))), {f_{1}, \dots,f_{k}}&#x3D;\text{argTopK}_{f_{*}\in { 1,\dots,[ \frac{T}{2} ] }}(\mathbf{A}), p_{i}&#x3D;\lceil  \frac{T}{f_{i}} \rceil,i\in{1,\dots,k}<br>$$<br>这里$\text{FFT}(\cdot)$与$\text{Amp}(\cdot)$分别代表FFT和计算振幅的函数。$\mathbf{A}\in \mathbb{R}^T$代表计算出来每个频率的振幅。这个振幅为C个维度的均值$\text{Avg}(\cdot)$计算得来。记$A_{j}$为频率 j 的周期基函数的强度，其对应的周期长度为$\lceil  \frac{T}{j}  \rceil$，考虑到频域内的稀疏性且避免无意义的高频带来的噪声，作者只选择前 k 个强度的值并选择最显著的频率，优于频域内的共轭性，作者将只考虑${  1,\dots,\lceil  \frac{T}{2}  \rceil }$中的频率，作者将上面的式子总结如下：<br>$$<br>\mathbf{A}, { f_{1},\dots,f_{k} },{ p_{1},\dots,p_{k} }&#x3D;\text{Period}(\mathbf{X}_{\text{1D}})<br>$$<br>基于选择的频率${ f_{1},\dots f_{k} }$和对应的周期长度${ p_{1},\dots p_{k} }$，作者将原来的时间序列转化为一个$$\mathbf{X}_{\text{2D}}^i&#x3D;\text{Reshape}_{p_{i},f_{i}}(\text{Padding}(\mathbf{X}_{\text{1D}})),i\in { 1,\dots,k }$$$\text{Padding}$函数是将序列延长来让其可以被reshape，$p_{i}, f_{i}$代表转化后的2D张量的行数和列数，$\mathbf{X}_{\text{2D}}^i\in \mathbb{R}^{p_{i}\times f_{i}\times C}$代表着基于频率$f_{i}$的第 i 个重构的时间序列，于是我们得到了一系列2D张量${ \mathbf{X}_{\text{2D}}^1,\dots,\mathbf{X}_{\text{2D}}^k }$，这代表着 k 种不同的2D时间多样性。<br><em>这样的Reshape操作给模型带来了两种局部性质：1. 邻近时间点的局部性；2. 邻近周期的局部性。正因如此，2D时间多样性可以被简单地通过2D核函数处理。</em></p><h2 id="TimesBlock"><a href="#TimesBlock" class="headerlink" title="TimesBlock"></a>TimesBlock</h2><p>对于长度为T的时间序列$\mathbf{X}_{\text{1D}}\in \mathbb{R}^{T\times C}$我们通过一个嵌入层$\mathbf{X}_{\text{1D}}^0&#x3D;\text{Embed}(\mathbf{X}_{\text{1D}})$将原始输入映射为深层特征$\mathbf{X}_{\text{1D}}^0\in \mathbb{R}^{T\times d_{model}}$。对于第 l 层的TimesNet，输入$\mathbf{X_{\text{1D}}}^{l-1}\in \mathbb{R}^{T\times d_{model}}$。计算公式如下所示：<br>$$<br>\mathbf{X}_{\text{1D}}^l&#x3D;\text{TimesBlock}(\mathbf{X}_{\text{1D}}^{l-1})+\mathbf{X}_{\text{1D}}^{l-1}<br>$$<br>对于TimesBlock内部，存在有两个连续的部分：捕捉时序2D多样性并按照不同周期安排模型的表示。</p><h3 id="Capturing-temporal-2D-variations"><a href="#Capturing-temporal-2D-variations" class="headerlink" title="Capturing temporal 2D-variations"></a>Capturing temporal 2D-variations</h3><p>我们对于深度特征$\mathbf{X}_{\text{1D}}^{l-1}$的周期长度估计也可以采用$\text{Period}(\cdot)$进行，基于估计出的周期长度，我们可以将1D时间序列转化到2D空间并获取一组2D张量，并使用参数高效的Inception模块来便捷地提取有信息的表示，这个过程可以如下展示：<br>$$<br>\begin{align}<br>\mathbf{A}^{l-1}, {f_1, \cdots, f_k}, {p_1, \cdots, p_k} &amp;&#x3D; \text{Period}(\mathbf{X}_{\text{1D}}^{l-1}), \\<br>\mathbf{X}_{\text{2D}}^{l,i} &amp;&#x3D; \text{Reshape}_{p_i, f_i}(\text{Padding}(\mathbf{X}_{\text{1D}}^{l-1})), , i \in {1, \cdots, k} \\<br>\hat{\mathbf{X}}_{\text{2D}}^{l,i} &amp;&#x3D; \text{Inception}(\mathbf{X}_{\text{2D}}^{l,i}), , i \in {1, \cdots, k} \\<br>\hat{\mathbf{X}}_{\text{1D}}^{l,i} &amp;&#x3D; \text{Trunc}(\text{Reshape}_{1, (p_i \times f_i)}(\hat{\mathbf{X}}_{\text{2D}}^{l,i})), , i \in {1, \cdots, k},<br>\end{align}<br>$$<br>其中$\mathbf{X}_{\text{2D}}^{l,i}\in \mathbb{R}^{p_{i}\times f_{i}\times d_{model}}$为第 i 层变换后的2D张量，在变换之后，采用一个Inception模块处理2D张量，这包括了一个多尺度2D核函数，这也是目前最为常用的视觉网络主干。然后将2D表示转化为1D $\hat{\mathbf{X}}_{\text{1D}}^{l,i}\in \mathbb{R}^{T\times d_{model}}$用以下一步的聚合操作。作者在聚合前还使用$\text{Trunc}(\cdot)$函数将序列($p_{i}\times f_{i}$)截断为原始长度$T$.</p><h3 id="Adaptive-aggregation"><a href="#Adaptive-aggregation" class="headerlink" title="Adaptive aggregation"></a>Adaptive aggregation</h3><p>最后，作者需要将k个不同的1D表示${ \hat{\mathbf{X}}_{\text{1D}}^{l,1},\dots,\hat{\mathbf{X}}_{\text{1D}}^{l,k} }$融合起来并输入至下一层。由自相关的思路启发，振幅$\mathbf{A}$可以反映选中频率的相对强度，因此每个2D张量的重要性也可以与振幅一一对应：<br>$$<br>\begin{gather*}<br>\widehat{\mathbf{A}}_{f_1}^{l-1}, \dots, \widehat{\mathbf{A}}_{f_k}^{l-1} &#x3D; \text{Softmax} ( \mathbf{A}_{f_1}^{l-1}, \dots, \mathbf{A}_{f_k}^{l-1} ) \\<br>\mathbf{X}_{\text{1D}}^l &#x3D; \sum_{i&#x3D;1}^k \widehat{\mathbf{A}}_{f_i}^{l-1} \times \widehat{\mathbf{X}}_{\text{1D}}^{l,i}.<br>\end{gather*}<br>$$<br>因为周期间与周期内的多样性已经包含在多个高度结构化的2D张量中了，TimesBlock便可以同时捕捉多个尺度下的时序2D多样性。因此，TimesNet可以获得一个更加高效的表示。</p><h3 id="Generality-in-2D-vision-backbones"><a href="#Generality-in-2D-vision-backbones" class="headerlink" title="Generality in 2D vision backbones"></a>Generality in 2D vision backbones</h3><p>得益于将1D序列转化为2D张量，我们可以选择多个计算机视觉主干网络来取代表示学习中的Inception模块，例如ResNet, ResNeXt, ConvNeXt与基于注意力的网络。这样时序分析也可以使用计算机视觉中的方法。</p><h1 id="Implement-details"><a href="#Implement-details" class="headerlink" title="Implement details"></a>Implement details</h1><p>令 $d_{model} &#x3D; \text{min}{ \text{max}{ 2^{\lceil \log C \rceil}, d_{min} }, d_{max} }$<br>对于预测任务，作者在时间维度上使用MLP来初始化预测的未来。同时使用序列归一化来减少分布漂移。</p><hr><p>Cover image icon by <a href="https://www.flaticon.com/free-icons/inference" title="inference icons">Dewi Sari</a> from <a href="https://www.flaticon.com/free-icons/inference" title="inference icons">Flaticon</a></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 机器学习 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 深度学习 </tag>
+            
+            <tag> 论文阅读 </tag>
+            
+            <tag> 时间序列 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>GSSG论文阅读</title>
       <link href="/2026/01/12/GSSG/"/>
       <url>/2026/01/12/GSSG/</url>
