@@ -4,6 +4,35 @@
   
     
     <entry>
+      <title>TimesNet代码阅读</title>
+      <link href="/2026/02/13/TimesNet-code/"/>
+      <url>/2026/02/13/TimesNet-code/</url>
+      
+        <content type="html"><![CDATA[<p>TimesNet模型相对简单，其核心思想有两点：</p><ol><li>Inception模块的使用</li><li>采用FFT对于时间序列进行Reshape</li></ol><h1 id="要点速递"><a href="#要点速递" class="headerlink" title="要点速递"></a>要点速递</h1><ol><li>Inception Module: 具有多个卷积核的模块，主要用于提取特征</li><li>初始化未来预测：在输入backbone之前，先使用MLP预测一个初步的结果，然后根据预测结果与原数据再使用backbone进行预测。作者仓库中就是使用了一个线性层，将seq_len的序列转化为seq_len + pred_len 长度的序列。</li></ol><h1 id="Inception-Module"><a href="#Inception-Module" class="headerlink" title="Inception Module"></a>Inception Module</h1><h2 id="简要介绍"><a href="#简要介绍" class="headerlink" title="简要介绍"></a>简要介绍</h2><p>Inception模块是对于卷积层的组合与提升，相较于传统卷积神经网络每层仅使用一种卷积核，Inception选择使用多种卷积核同时引出 $1\times 1$大小的卷积核。该模块具有以下作用：</p><ol><li>Inception模块相较于单个卷积层，其内部具有多个大小的卷积核，可以提取更多非冗余的特征，其感知能力更强；</li><li>$1\times 1$卷积核大大减少计算量的同时依旧保持特征捕捉能力，其本质为不同通道间的线性组合。<br>Inception由Google团队提出，具有多个版本（v1, v2, v3, v4）。于<em>Going deeper with convolutions</em>论文在2014年首次提出，并在ILSVRC-2014的图像分类竞赛中获得了top-5误差6.7%的冠军成绩。这里作者选用该模块就是为了验证图像处理模块在其提出的方法下是否有效。</li></ol><h2 id="模型架构"><a href="#模型架构" class="headerlink" title="模型架构"></a>模型架构</h2><p>作者在该文章中使用Inception v1，但是其架构并非完全照搬，而是在一定程度上进行了改写：<br>6个卷积核，大小为 1, 3, 5, 7, 9, 11, 每个卷积核均进行padding操作以保证输入与输出张量长与宽大小相同，卷积核采用kaiming初始化方法，并将每个卷积核输出结果创建一个新的维度进行堆叠并对该维度求均值(mean pooling)。</p><h1 id="模型主干"><a href="#模型主干" class="headerlink" title="模型主干"></a>模型主干</h1><h2 id="分类模型"><a href="#分类模型" class="headerlink" title="分类模型"></a>分类模型</h2><h3 id="数据嵌入"><a href="#数据嵌入" class="headerlink" title="数据嵌入"></a>数据嵌入</h3><p>作者在本文章中使用了2种嵌入方法：数值嵌入(value_embedding), 位置嵌入(position_embedding)。数值嵌入：1D卷积操作；位置嵌入：旋转位置编码。计算出嵌入后加起来得到嵌入。</p><h3 id="TimesBlock"><a href="#TimesBlock" class="headerlink" title="TimesBlock"></a>TimesBlock</h3><p>输入$x\in \mathbb{R}^{B\times T\times N}$ , 首先经过<code>FFT_for_Period</code>获得每个通道的频谱图，返回前 k 个周期与选中频率在不同频道的强度均值。<br>然后根据选择的周期进行padding操作，并reshape为$\mathbb{R}^{B, T&#x2F;P, P, N}$，其中P代表周期长度。<br>输出经过 Inception - GELU - Inception并将最终的结果裁剪回原长度<br>按照不同频率的强度进行加权求和得到 res 并与原输入 x 相加进行残差连接得到输出。</p><h3 id="分类头"><a href="#分类头" class="headerlink" title="分类头"></a>分类头</h3><p>最终采用relu激活后，使用x_mark_enc进行遮掩（x_mark_enc用于确认哪些数据真实，哪些数据仅仅是填补）并输出到线性层得出最终分类结果。</p><h2 id="预测模型"><a href="#预测模型" class="headerlink" title="预测模型"></a>预测模型</h2><h3 id="数据嵌入-1"><a href="#数据嵌入-1" class="headerlink" title="数据嵌入"></a>数据嵌入</h3><p>相较于分类模型，数据嵌入加入了时间嵌入(Temporal_embedding)，其时间嵌入为一个线性层，输入为每个时间节点所对应的年月日小时分，可以选择可训练或者不可训练。</p><h3 id="初始化未来预测"><a href="#初始化未来预测" class="headerlink" title="初始化未来预测"></a>初始化未来预测</h3><p>在预测模型中，由于预测模型训练相对困难，所以常常使用MLP根据训练数据预测一个结果，然后根据预测结果与训练数据对TimesBlock进行训练。</p><h3 id="归一化与逆归一化"><a href="#归一化与逆归一化" class="headerlink" title="归一化与逆归一化"></a>归一化与逆归一化</h3><p>序列数据为了避免数据漂移，所以需要进行归一化与逆归一化的操作。</p><h2 id="异常检测与插值模型"><a href="#异常检测与插值模型" class="headerlink" title="异常检测与插值模型"></a>异常检测与插值模型</h2><p>这两个模型没有新概念，仅仅将之前的概念重复组合。</p><h3 id="异常检测模型"><a href="#异常检测模型" class="headerlink" title="异常检测模型"></a>异常检测模型</h3><p>相较于预测模型去掉了时间嵌入模块与初始化未来预测的部分</p><h3 id="插值模型"><a href="#插值模型" class="headerlink" title="插值模型"></a>插值模型</h3><p>相较于分类模型最后使用x_mark_enc进行遮掩，其遮掩发生在输入TimesNet之前（如果依旧采用分类模型的方法，最后插值的结果肯定为0）。且最后一层网络为映射头，将输出转化为与输入相同。</p><hr><p>Cover image icon by <a href="https://www.flaticon.com/free-icons/inference" title="inference icons">Dewi Sari</a> from <a href="https://www.flaticon.com/free-icons/inference" title="inference icons">Flaticon</a></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 机器学习 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 深度学习 </tag>
+            
+            <tag> 代码阅读 </tag>
+            
+            <tag> 时间序列 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>TimesNet(ICLR, 2023)</title>
       <link href="/2026/02/12/TimesNet/"/>
       <url>/2026/02/12/TimesNet/</url>
