@@ -4,6 +4,33 @@
   
     
     <entry>
+      <title>TimeXer代码阅读</title>
+      <link href="/2026/03/01/TimeXer%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/"/>
+      <url>/2026/03/01/TimeXer%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/</url>
+      
+        <content type="html"><![CDATA[<h1 id="模块"><a href="#模块" class="headerlink" title="模块"></a>模块</h1><h3 id="EnEmbedding"><a href="#EnEmbedding" class="headerlink" title="EnEmbedding"></a>EnEmbedding</h3><p>用于将时间序列嵌入为 patch-wise 与 global 的 tokens, 此处编码方式为“RoPE” 以及 “线性变换”，最终得到编码结果为两者相加，然后再将编码后的序列与 global_token(<code>glb_token</code>) 在patch的维度拼接起来：<br>此处输入 $x \in \mathbb{R}^{16,1,168}$ 为 (batch_size, var_num, seq_len), 然后经过编码转化为 $\mathbb{R}^{16, 1, 10, 512}$ (batch_size, var_num, patch_num, d_model)。与 global_token 堆叠为 $\mathbb{R}^{16,1,11,512}$ 输出。</p><h3 id="DataEmbedding-inverted"><a href="#DataEmbedding-inverted" class="headerlink" title="DataEmbedding_inverted"></a>DataEmbedding_inverted</h3><p>这个模块在模型中主要用于 <strong>外部变量</strong> 的嵌入，即 <code>ex_embedding</code> ， 输入外部变量和时间变量。将外部变量与时间变量按照通道维度拼接后输入线性层中进行嵌入，得到 $\mathbb{R}^{16, 6, 512}$ 即 (batch_size, exvar_num + temporal_num, d_model)。</p><h3 id="Encoder"><a href="#Encoder" class="headerlink" title="Encoder"></a>Encoder</h3><p>编码器，输入上面两模块(<code>EnEmbedding</code> 与 <code>DataEmbedding_inverted</code>)嵌入得到的 token 进行注意力机制:</p><h4 id="Attention"><a href="#Attention" class="headerlink" title="Attention"></a>Attention</h4><p>注意力机制的实现流程：1. x通过线性层映射为 $\text{head_num} \times\text{d_model}$ 维度的queries, keys, values，这样后面进行分头操作只需要再增加一个维度。2. 进行 $\text{Softmax}(\frac{QK^T}{\sqrt{ d_{k} }})V$。此处的矩阵乘法采用 <code>torch.einsum</code> 进行，该函数在注意力机制中常如下使用：</p><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">scores = torch.einsum(<span class="string">&quot;blhe,bshe-&gt;bhls&quot;</span>, queries, keys)</span><br><span class="line">A = torch.softmax(scale * scores, dim=-<span class="number">1</span>)</span><br><span class="line">V = torch.einsum(<span class="string">&quot;bhls,bshd-&gt;blhd&quot;</span>, A, values)</span><br></pre></td></tr></table></figure><p>此处 “blhe,bshe-&gt;bhls” 代表<br>$$<br>[QK^T]_{b,h,l,s}&#x3D;\sum_{e}Q_{b,l,h,e}K_{b,s,h,e}<br>$$<br>同时 <code>torch.softmax</code> 的操作在最后一个维度代表：在最后一个维度之和为1，即：<br>$$<br>\sum_{s} W_{b,h,l,s}&#x3D; 1<br>$$<br>最后再将多头注意力输出结果输入至线性层中映射回 d_model 维度。</p><h4 id="Cross-Attention"><a href="#Cross-Attention" class="headerlink" title="Cross Attention"></a>Cross Attention</h4><p>相较于普通Attention机制中，queries 与 keys 的通道数相同， cross-attention 的通道数并不相同。这里作者采用的是 全局 token 与 patch token 之间的 cross-attention, 其中 queries 为全局 token. 采用 queries 作为全局 token 可以保证：1. 矩阵运算的正确性，如果选择 keys 或者 values 则需要同时改变 2 个；2. 如果选择 values， 则最终输出的结果通道数为 6， 而非 1.</p><h4 id="Encoder-1"><a href="#Encoder-1" class="headerlink" title="Encoder"></a>Encoder</h4><p>然后按照如下过程处理：<br>en_patch-en_patch: Full Attention -&gt; 残差连接 -&gt; 层归一化<br>en_global-ex_global: Cross Attention -&gt; 残差连接 -&gt; 层归一化<br>以上输出在通道维度(C)上拼接。并对于 d_model 维度使用一次 Linear + GELU + Linear(512 -&gt; 2048 -&gt; 512) 后进行残差连接。最后输入 层归一化。</p><h4 id="多个Encoder堆叠"><a href="#多个Encoder堆叠" class="headerlink" title="多个Encoder堆叠"></a>多个Encoder堆叠</h4><p>以上就是单层的Encoder架构，3个 Encoder 堆叠后在进行一次层归一化得到最终的输出，然后展平后输入 Linear 层转化为 <strong>预测序列长度</strong> 的片段</p><hr><p>Cover image icon by <a href="https://www.flaticon.com/free-icons/inference" title="inference icons">Dewi Sari</a> from <a href="https://www.flaticon.com/free-icons/inference" title="inference icons">Flaticon</a></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 机器学习 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 深度学习 </tag>
+            
+            <tag> 代码阅读 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>TimeXer(NeurIPS, 2024)</title>
       <link href="/2026/02/27/TimeXer/"/>
       <url>/2026/02/27/TimeXer/</url>
