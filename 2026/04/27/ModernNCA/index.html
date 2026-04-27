@@ -1,0 +1,224 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>ModernNCA(ICLR, 2025) | Evanescence's Blog</title><meta name="author" content="Henry"><meta name="copyright" content="Henry"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="ffffff"><meta name="description" content="深度学习的方法常常从传统方法中启发而来，作者重新考虑了KNN的另外一个版本：Neightbourhood Components Analysis(NCA)。这个方法最初被用于学习线性映射器来捕捉不同样本之间的语义学相关性，作者尝试性逐步增加现代深度学习方法，并发现，使用SGD且没有降维操作的NCA方法效果已经取得了在表格数据中不错的效果。将NCA与深度表示与额外的训练随机性结合可以大大提高其准确率">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ModernNCA(ICLR, 2025)">
+<meta property="og:url" content="http://evanescence0515.github.io/2026/04/27/ModernNCA/index.html">
+<meta property="og:site_name" content="Evanescence&#39;s Blog">
+<meta property="og:description" content="深度学习的方法常常从传统方法中启发而来，作者重新考虑了KNN的另外一个版本：Neightbourhood Components Analysis(NCA)。这个方法最初被用于学习线性映射器来捕捉不同样本之间的语义学相关性，作者尝试性逐步增加现代深度学习方法，并发现，使用SGD且没有降维操作的NCA方法效果已经取得了在表格数据中不错的效果。将NCA与深度表示与额外的训练随机性结合可以大大提高其准确率">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://evanescence0515.github.io/img/deeplearning_pic.png">
+<meta property="article:published_time" content="2026-04-27T06:16:47.000Z">
+<meta property="article:modified_time" content="2026-04-27T06:16:47.000Z">
+<meta property="article:author" content="Henry">
+<meta property="article:tag" content="深度学习">
+<meta property="article:tag" content="论文阅读">
+<meta property="article:tag" content="时间序列">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://evanescence0515.github.io/img/deeplearning_pic.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "ModernNCA(ICLR, 2025)",
+  "url": "http://evanescence0515.github.io/2026/04/27/ModernNCA/",
+  "image": "http://evanescence0515.github.io/img/deeplearning_pic.png",
+  "datePublished": "2026-04-27T06:16:47.000Z",
+  "dateModified": "2026-04-27T06:16:47.000Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Henry",
+      "url": "http://evanescence0515.github.io"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://evanescence0515.github.io/2026/04/27/ModernNCA/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', 'ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"未找到符合您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'ModernNCA(ICLR, 2025)',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg" style="background-color: #EEEEEE;"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/my_icon.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">44</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">14</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">5</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> List</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/tools/"><i class="fa-fw fas fa-tools"></i><span> Tools</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/deeplearning_pic.png);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Evanescence's Blog</span></a><a class="nav-page-title" href="/"><span class="site-name">ModernNCA(ICLR, 2025)</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> List</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/tools/"><i class="fa-fw fas fa-tools"></i><span> Tools</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">ModernNCA(ICLR, 2025)</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2026-04-27T06:16:47.000Z" title="发表于 2026-04-27 14:16:47">2026-04-27</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-04-27T06:16:47.000Z" title="更新于 2026-04-27 14:16:47">2026-04-27</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><p>深度学习的方法常常从传统方法中启发而来，作者重新考虑了KNN的另外一个版本：<strong>Neightbourhood Components Analysis(NCA)</strong>。这个方法最初被用于学习线性映射器来捕捉不同样本之间的语义学相关性，作者尝试性逐步增加现代深度学习方法，并发现，使用SGD且没有降维操作的NCA方法效果已经取得了在表格数据中不错的效果。将NCA与深度表示与额外的训练随机性结合可以大大提高其准确率，达到能和CatBoost相近，超过其他已有深度学习方法的效果。</p>
+<h1 id="Related-work"><a href="#Related-work" class="headerlink" title="Related work"></a>Related work</h1><h2 id="NCA-Variants"><a href="#NCA-Variants" class="headerlink" title="NCA  Variants"></a>NCA  Variants</h2><p>最近邻方法基于每个样本的近邻来预测。相较于传统的使用原始特征识别邻居，NCA使用了一个不同的最近邻损失函数（也被称为 soft-NN loss）来学习一个线性映射，得到更好的距离度量。已有工作改变了损失函数或者探索NCA在数据可视化中的作用。一些NCA的非线性拓展被用于图像分类并略微提升了效果（例如限制玻尔兹曼机）。对于视觉任务，soft-NN 损失函数对于深度学习表示的复杂作用曾有相关分析，且不同的损失函数已经被用在小样本学习中。NCA在图像任务中的有效性暗示着其潜力，也激发了作者开发 <em>ModernNCA</em>。</p>
+<h2 id="Metric-Learning"><a href="#Metric-Learning" class="headerlink" title="Metric Learning"></a>Metric Learning</h2><p>NCA是一种度量学习，其映射本质上将相似样本拉近，而不同样本远离，然后使用KNN进行分类。该方法最开始便用于表格数据。尺度学习现在已经进化为一个有用的工具，尤其是当与深度学习技术结合的时候，例如：图像识别、人物识别、推荐系统领域。最近 <em>LocalPFN</em> 向 <em>TabPFN</em> 引入 <em>KNN</em> ， <em>TabR</em> 引入一个带有类Attention机制的前馈神经网络，其检索每个样本的邻居用以增强表格数据的效果。其效果虽好，但是高计算量和架构的复杂性限制了 <em>TabR</em> 的实际使用。作者在这篇文章中提出了一个相较于 <em>TabR</em> 更加简单且高效的模型。</p>
+<h1 id="Preliminary"><a href="#Preliminary" class="headerlink" title="Preliminary"></a>Preliminary</h1><h2 id="NCA"><a href="#NCA" class="headerlink" title="NCA"></a>NCA</h2><p><em>NCA</em> 关注于分类任务，依据 1NN 准则，<em>NCA</em> 定义了 $x_{j}$ 为 $x_{i}$ 邻居的概率(Equation 1)：<br>$$<br>Pr({x}_j \in \mathcal{N}({x}_i; \mathcal{D}) \mid {x}_i, \mathcal{D}, {L}) &#x3D; \frac{\exp \left(-\operatorname{dist}^2({L}^{\top} {x}_i, {L}^{\top} {x}_j)\right)}{\sum_{({x}_l, y_l) \in \mathcal{D}, {x}_l \neq {x}_i} \exp \left(-\operatorname{dist}^2({L}^{\top} {x}_i, {L}^{\top} {x}_l)\right)}<br>$$<br>$x_{i}$ 被分为类别 $y_{i}$ 的概率为(Equation 2)：<br>$$<br>Pr(\hat{y}_i &#x3D; y_i \mid \boldsymbol{x}_i, \mathcal{D}, \boldsymbol{L}) &#x3D; \sum_{(\boldsymbol{x}_j, y_j) \in \mathcal{D} \wedge y_j &#x3D; y_i} \Pr(\boldsymbol{x}_j \in \mathcal{N}(\boldsymbol{x}_i; \mathcal{D}) \mid \boldsymbol{x}_i, \mathcal{D}, \boldsymbol{L})<br>$$<br>$\boldsymbol{L}\in \mathbb{R}^{d\times d’}$ 是一个线性映射，且 $d’$ 常常小于等于 $d$。这样可以实现原始输入的降维操作。最初的 <em>NCA</em> 最大化 $Pr(\hat{y}_i &#x3D; y_i \mid \boldsymbol{x}_i, \mathcal{D}, \boldsymbol{L})$ 之和。相较于均等的考虑所有最近邻的样本，该方法是一个 软间隔方法的KNN。</p>
+<h2 id="TabR"><a href="#TabR" class="headerlink" title="TabR"></a>TabR</h2><p><em>TabR</em> 识别在嵌入空间中 K 最近邻并如下定义每个近邻的贡献 $(\boldsymbol{x}_{i}, y_{i})$: $s(\boldsymbol{x}_{i}, \boldsymbol{x}_{j}, y_{j}) &#x3D; \boldsymbol{W}\boldsymbol{y}_{j}+T(\boldsymbol{L}^TE(\boldsymbol{x}_{j})-\boldsymbol{L}^TE(\boldsymbol{x}_{i}))$<br>。此处，T是一个转换层，由线性层、dropout、ReLU、与另一个线性层构成。$E$ 代表 <em>TabR</em> 的嵌入模块， $\boldsymbol{W}$ 为线性层，$\boldsymbol{y}_{i}$ 为编码后的 $y_{i}$。随后逐样本打分如下计算 $R(\boldsymbol{x}_j, y_j, \boldsymbol{x}_i) &#x3D; \sum_{(\boldsymbol{x}_j, y_j) \in \mathcal{D}} \alpha_j \cdot s(\boldsymbol{x}_i, \boldsymbol{x}_j, y_j)$，其中$\alpha_{j}$如下定义：$\alpha_j \propto {-\operatorname{dist}(\boldsymbol{L}^{\top} E(\boldsymbol{x}_j), \boldsymbol{L}^{\top} E(\boldsymbol{x}_i))}$ 并使用一个 softmax 函数进行归一化。然后该分数将会与 $E(\boldsymbol{x}_{i})$ 相加并输入到预测模块中获取 $\hat{y}_{i}$。</p>
+<h1 id="ModernNCA"><a href="#ModernNCA" class="headerlink" title="ModernNCA"></a>ModernNCA</h1><p>考虑到初始 <em>TabR</em> 的有效结果，作者考虑将最原始的 <em>NCA</em> 作为起点并逐步增加复杂性。该研究策略遵循奥卡姆剃刀原则，让作者更能识别出该方法在表格数据中展现优秀表现的主要因素。作者有以下2个主要尝试。</p>
+<h2 id="The-First-Attempt"><a href="#The-First-Attempt" class="headerlink" title="The First Attempt"></a>The First Attempt</h2><p>作者对于等式1进行推广，采用转换函数 $\phi$ 替代 $\boldsymbol{L}$ 来进行映射。为了和 <em>NCA</em> 保持一致性，作者一开始定义 $\phi$ 为线性层。</p>
+<h3 id="Learning-Objective"><a href="#Learning-Objective" class="headerlink" title="Learning Objective"></a>Learning Objective</h3><p>假设，$y_{i}$ 在回归任务中连续，分类任务中为one-hot编码。作者如下修改 等式2<br>$$<br>\hat{y}_i &#x3D; \sum_{(\boldsymbol{x}_j, y_j) \in \mathcal{D}} \frac{\exp \left(-\operatorname{dist}^2(\phi(\boldsymbol{x}_i), \phi(\boldsymbol{x}_j))\right)}{\sum_{(\boldsymbol{x}_l, y_l) \in \mathcal{D}, \boldsymbol{x}_l \neq \boldsymbol{x}_i} \exp \left(-\operatorname{dist}^2(\phi(\boldsymbol{x}_i), \phi(\boldsymbol{x}_l))\right)} y_j .<br>$$<br>这里对于分类问题，$\hat{y}_{i}\in \mathbb{R}^C$ 为概率向量表示 ${ \text{Pr}(\hat{y}_{i}&#x3D;c | \boldsymbol{x}_{i},\mathcal{D}, \phi ) }_{c\in[C]}$。<br>该Loss function也被称为 soft Nearest Neighbor(soft-NN). 相较于之前NCA所使用的概率和，作者采用对数概率之和效果更好。</p>
+<h3 id="Prediction-Strategy"><a href="#Prediction-Strategy" class="headerlink" title="Prediction Strategy"></a>Prediction Strategy</h3><p>作者在计算时使用 $\text{SGD}$ 替代 $\text{L-BFGS}$ 优化器发现效果更加好。<strong>这个改进让NCA达到了和MLP等深度模型相匹敌的能力</strong></p>
+<h2 id="The-Second-Attempt"><a href="#The-Second-Attempt" class="headerlink" title="The Second Attempt"></a>The Second Attempt</h2><h3 id="架构"><a href="#架构" class="headerlink" title="架构"></a>架构</h3><p>为了向模型中引入非线性，作者首先向 $\phi$ 引入多个非线性层，包括一个批归一化、一个线性层、ReLU激活函数、dropout和另外一个线性层。<br>$$<br>g(\boldsymbol{x}_i) &#x3D; \text{Linear} \left( \text{Dropout} \left( \text{ReLU} \left( \text{Linear} \left( \text{BatchNorm} \left( \boldsymbol{x}_i \right) \right) \right) \right) \right)<br>$$</p>
+<h3 id="Stochastic-Neighborhood-Sampling"><a href="#Stochastic-Neighborhood-Sampling" class="headerlink" title="Stochastic Neighborhood Sampling"></a>Stochastic Neighborhood Sampling</h3><p>loss函数计算过程中由于需要计算两两样本间的距离，所以作者提出了一种加速方法，叫随机近邻采样方法(SNS)，该方法将会从训练集合$\mathcal{D}$ 中采样出 $\hat{\mathcal{D}}$，并只计算该子集中的样本。但是在测试过程中则会从整个训练集合中进行检索。<br>该方法不仅仅提高了训练效率，同时还提高了模型的泛化能力。</p>
+<h3 id="Distance-Function"><a href="#Distance-Function" class="headerlink" title="Distance Function"></a>Distance Function</h3><p>作者使用欧几里得距离作为距离函数。</p>
+<h1 id="Analysis-and-Ablation-Studies-of-ModernNCA"><a href="#Analysis-and-Ablation-Studies-of-ModernNCA" class="headerlink" title="Analysis and Ablation Studies of ModernNCA"></a>Analysis and Ablation Studies of ModernNCA</h1><h3 id="映射到高维空间是否有效"><a href="#映射到高维空间是否有效" class="headerlink" title="映射到高维空间是否有效"></a>映射到高维空间是否有效</h3><p><em>NCA</em> 设计时便限制 $d’\leq d$，在实验中作者将这个限制取消，虽然高维的映射并没有本质上提高表示能力，但是平均的准确率提升暗示高维度空间可能会帮助非凸问题的优化并提高泛化性。</p>
+<h3 id="SGD是否有效"><a href="#SGD是否有效" class="headerlink" title="SGD是否有效"></a>SGD是否有效</h3><p>SGD相较于L-BFGS效果会更加好。</p>
+<hr>
+
+<p>Cover image icon by <a target="_blank" rel="noopener" href="https://www.flaticon.com/free-icons/inference" title="inference icons">Dewi Sari</a> from <a target="_blank" rel="noopener" href="https://www.flaticon.com/free-icons/inference" title="inference icons">Flaticon</a></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://evanescence0515.github.io">Henry</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://evanescence0515.github.io/2026/04/27/ModernNCA/">http://evanescence0515.github.io/2026/04/27/ModernNCA/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="http://evanescence0515.github.io" target="_blank">Evanescence's Blog</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a><a class="post-meta__tags" href="/tags/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/">论文阅读</a><a class="post-meta__tags" href="/tags/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97/">时间序列</a></div><div class="post-share"><div class="social-share" data-image="/img/deeplearning_pic.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related full-width" href="/2026/03/01/TimeXer%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/" title="TimeXer代码阅读"><img class="cover" src="/img/deeplearning_pic.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">TimeXer代码阅读</div></div><div class="info-2"><div class="info-item-1">模块EnEmbedding用于将时间序列嵌入为 patch-wise 与 global 的 tokens, 此处编码方式为“RoPE” 以及 “线性变换”，最终得到编码结果为两者相加，然后再将编码后的序列与 global_token(glb_token) 在patch的维度拼接起来：此处输入 $x \in \mathbb{R}^{16,1,168}$ 为 (batch_size, var_num, seq_len), 然后经过编码转化为 $\mathbb{R}^{16, 1, 10, 512}$ (batch_size, var_num, patch_num, d_model)。与 global_token 堆叠为 $\mathbb{R}^{16,1,11,512}$ 输出。 DataEmbedding_inverted这个模块在模型中主要用于 外部变量 的嵌入，即 ex_embedding ， 输入外部变量和时间变量。将外部变量与时间变量按照通道维度拼接后输入线性层中进行嵌入，得到 $\mathbb{R}^{16, 6, 512}$ 即 (batch_size, exvar_n...</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2026/02/25/Nonstationary/" title="Non-Stationary Transformer(NeurIPS, 2022)"><img class="cover" src="/img/deeplearning_pic.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-02-25</div><div class="info-item-2">Non-Stationary Transformer(NeurIPS, 2022)</div></div><div class="info-2"><div class="info-item-1">Non-Stationary Transformer(NeurIPS, 2022)源代码Transformer在时序预测上有着强大的能力，这是由于其具有的全局时序依赖建模能力(global-range modeling ability)。但是，其表现可能会在非平稳的真实世界数据中退化，这是因为真实世界的数据之间的联合分布是随时间的推移而发生变化，即非严平稳。过去的研究中主要使用平稳化的方法来减少非平稳数据的影响，但是平稳序列在一定程度上削弱了其固有的非平稳部分，这会使得构造的模型对于真实世界的预测效果变弱（真实世界数据大量存在非平稳）。这样的问题被称为 过平稳化(over-stationarization)。这也让Transformers的预测能力下降。为了解决这个问题，作者便提出了 Non-stationary Transformers 。改模型相较于Transformer模型减少了49.43%的MSE。 Related Work时序预测的平稳化为了将非平稳的数据转化为平稳数据，最经典的方法就是 ARIMA 中所使用的差分。这里简单讲述一下差分的做法：ARIMA相较于AR(Au...</div></div></div></a><a class="pagination-related" href="/2026/02/26/TimeMixer/" title="TimeMixer(ICLR, 2024)"><img class="cover" src="/img/deeplearning_pic.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-02-26</div><div class="info-item-2">TimeMixer(ICLR, 2024)</div></div><div class="info-2"><div class="info-item-1">TimeMixer(ICLR, 2024)源代码相较于传统的序列分解(decompose)与多周期分析(multiperiodicity analysis)，作者将重心放在多尺度融合(multiscale-mixing)。这种多尺度融合的思路来自于一个很直觉的想法：在不同的采样率下时间序列会展现出不同的特征。如此微观与宏观的信息可以反映在粗粒度与细粒度下反映出来，这样复杂的信息就可以从本质上解开。基于这种想法，作者提出了 TimeMixer ，其作为一个完全基于MLP的架构，由 Past-Decomposable-Mixing(PDM) 与 Future-Multipredictor-Mixing(FMM) 块构成 Related workMixing（混合）是一种有效的信息整合方式，已被广泛应用于计算机视觉和自然语言处理领域。例如，MLP-Mixer 为图像识别设计了一种两阶段的混合结构，使用线性层依次对通道信息和图像块（patch）信息进行混合。FNet 则将 Transformer 中的注意力层替换为简单的傅里叶变换，从而实现对句子中 token 的高效混合。在本文中，作者...</div></div></div></a><a class="pagination-related" href="/2026/02/27/TimeXer/" title="TimeXer(NeurIPS, 2024)"><img class="cover" src="/img/deeplearning_pic.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-02-27</div><div class="info-item-2">TimeXer(NeurIPS, 2024)</div></div><div class="info-2"><div class="info-item-1">TimeXer(NeurIPS, 2024)源代码由于真实世界中时间序列预测的部分观察的特性，完全关注 内生性变量 (Endogenous, 即关注的目标变量) 是不足以保证预测的准确性。外生性变量(Exogenous, 即非关注的目标变量) 也会为模型提供宝贵的外部信息。因此，相较于之前的模型仅关注目标变量或者将所有变量相同对待的情况，这边文章提出了模型 TimeXer 来处理外部信息以预测内生性变量。 Introduction从时间序列建模的角度来看，外生性变量是作为预测的辅助信息而不需要被预测，其与内生性变量的不同给目前已有模型提出了新的挑战：首先，对于具有多个外部变量的模型，模型需要去权衡不同变量之间的依赖性与差异性，如果简单让外生性变量和内生性变量等价，则会造成不必要的交互；第二，外部变量可能存在与内生性变量的因果关系，所以模型也要能处理系统上的时间延迟现象；另外，一个实际使用的时间序列模型应该能够处理非规则的、具有异质性的时间序列，包括缺失值、时间未对齐、频率不匹配、长度差异。 TimeXerProblem Setting在具有外生性变量的预测中，我们被给予了一个时间...</div></div></div></a><a class="pagination-related" href="/2026/02/12/TimesNet/" title="TimesNet(ICLR, 2023)"><img class="cover" src="/img/deeplearning_pic.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-02-12</div><div class="info-item-2">TimesNet(ICLR, 2023)</div></div><div class="info-2"><div class="info-item-1">摘要为了解决1D时间序列在已有研究中展现出的限制，将其拓展到2D空间，作者基于多种周期将1D的时间序列转化为一系列2D的张量。这种转化可以将周期之间和周期内部的多样性嵌入为2D张量对应的行和列，让2D多样性可以被2D核函数更加容易地建模。技术上来说，作者提出了TimesNet和TimesBlock作为骨架。TimesBlock可以适应性地发现多周期性并使用一系列高参数效率(parameter-efficient)的Inception模块从2D图像中提取复杂的时间多样性。 名词 intraperiod-variation, interperiod-variation: 前者代表一个周期内的短期时间特征、后者代表不同周期内的长期特征。 TimesBlock: 将1D时间序列基于学习到的周期转化为一组2D张量并使用一个Inception模块进一步捕捉周期间和周期内的多样性。  TimesNetTransform 1D-Variations into 2D-Variations对于长度为T，具有C个维度的类别的时间序列，初始1D状态为$\mathbf{X}_{1D}\in \mathbb...</div></div></div></a><a class="pagination-related" href="/2025/09/21/Attic/" title="Attic速读(ICLR under review, 2025)"><img class="cover" src="/img/deeplearning_pic.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-09-21</div><div class="info-item-2">Attic速读(ICLR under review, 2025)</div></div><div class="info-2"><div class="info-item-1">作者在TabPFN的基础上作出了一个改进，准确率相较于TabPFN有相对较大的提升。相较于TabPFN对每个样本给出一个token，Attic选择将样本中每个特征均给出一个token，这在一定程度上解决了TabPFN所出现的“特征顺序不变性”的问题，提升了表格深度学习模型表现。 要点速递 Cell Tokens：即对于每个样本的每个特征均给出一个tokens，该想法并非作者独创，于SAINT(2021, NeurIPS Workshop)中便提及并使用，同时对于每个特征给出tokens(FT-Transformer, 2021, NeurIPS)和对于每个样本(TabPFN, 2023, ICLR)给出tokens的想法也均在之前的论文中提出并实践。但是并没有哪个方法格外优秀，这次作者的尝试证明使用单元格级别的tokens可以更加有效捕捉合成数据的相关性。 模型精度：作者尝试选用float16取代bfloat16，但是在预训练中失败了。float16代表更高精度和更小的范围，而bfloat16有精度较低而范围大。作者选择float16的原因很简单，高精度模型的测试确实准确率更高，...</div></div></div></a><a class="pagination-related" href="/2025/12/15/GCN-lesson2/" title="torch geometric学习笔记2(MessagePassing)"><img class="cover" src="/img/deeplearning_pic.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-12-15</div><div class="info-item-2">torch geometric学习笔记2(MessagePassing)</div></div><div class="info-2"><div class="info-item-1">torch_geometric官方教程该笔记主要参考：Creating Message Passing Networks — pytorch_geometric documentationMessagePassing功能是图神经网络区别于其他网络的重要部分，其给图神经网络提供了一种信息传递的功能，从某种程度上讲，MessagePassing就是一种特殊的卷积操作，让不同节点的数据相互交流。将卷积操作泛化到不规则的域被称为聚合或者信息传递。对于$\mathbf{x}_{i}^{(k-1)}\in \mathbb{R}^F$，其代表k-1层的节点 i .$\mathbf{e}_{j,i}\in \mathbb{R}^D$代表从节点 j 到节点 i 的边。信息传递可以表示为如下：$$\mathbf{x}_{i}^{(k)}&#x3D;\gamma^{(k)}\left(\mathbf{x}_{i}^{(k-1)}, \bigoplus_{j \in \mathcal{N}(i)} \phi^{(k)}\left(\mathbf{x}_{i}^{(k-1)}, \mathbf{x}_{j...</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/my_icon.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Henry</div><div class="author-info-description">至此鲜花赠自己，纵马踏花向自由</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">44</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">14</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">5</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/evanescence0515"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/evanescence0515" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:evanescence0515@gmail.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">你好呀，这里是Evanescence的博客，  我会经常分享一些学习统计学、生物信息学、机器学习和计算机技术的心得和笔记。</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Related-work"><span class="toc-number">1.</span> <span class="toc-text">Related work</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#NCA-Variants"><span class="toc-number">1.1.</span> <span class="toc-text">NCA  Variants</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Metric-Learning"><span class="toc-number">1.2.</span> <span class="toc-text">Metric Learning</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Preliminary"><span class="toc-number">2.</span> <span class="toc-text">Preliminary</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#NCA"><span class="toc-number">2.1.</span> <span class="toc-text">NCA</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#TabR"><span class="toc-number">2.2.</span> <span class="toc-text">TabR</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#ModernNCA"><span class="toc-number">3.</span> <span class="toc-text">ModernNCA</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#The-First-Attempt"><span class="toc-number">3.1.</span> <span class="toc-text">The First Attempt</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Learning-Objective"><span class="toc-number">3.1.1.</span> <span class="toc-text">Learning Objective</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Prediction-Strategy"><span class="toc-number">3.1.2.</span> <span class="toc-text">Prediction Strategy</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#The-Second-Attempt"><span class="toc-number">3.2.</span> <span class="toc-text">The Second Attempt</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9E%B6%E6%9E%84"><span class="toc-number">3.2.1.</span> <span class="toc-text">架构</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Stochastic-Neighborhood-Sampling"><span class="toc-number">3.2.2.</span> <span class="toc-text">Stochastic Neighborhood Sampling</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Distance-Function"><span class="toc-number">3.2.3.</span> <span class="toc-text">Distance Function</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Analysis-and-Ablation-Studies-of-ModernNCA"><span class="toc-number">4.</span> <span class="toc-text">Analysis and Ablation Studies of ModernNCA</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%98%A0%E5%B0%84%E5%88%B0%E9%AB%98%E7%BB%B4%E7%A9%BA%E9%97%B4%E6%98%AF%E5%90%A6%E6%9C%89%E6%95%88"><span class="toc-number">4.0.1.</span> <span class="toc-text">映射到高维空间是否有效</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#SGD%E6%98%AF%E5%90%A6%E6%9C%89%E6%95%88"><span class="toc-number">4.0.2.</span> <span class="toc-text">SGD是否有效</span></a></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2026/04/27/ModernNCA/" title="ModernNCA(ICLR, 2025)"><img src="/img/deeplearning_pic.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="ModernNCA(ICLR, 2025)"/></a><div class="content"><a class="title" href="/2026/04/27/ModernNCA/" title="ModernNCA(ICLR, 2025)">ModernNCA(ICLR, 2025)</a><time datetime="2026-04-27T06:16:47.000Z" title="发表于 2026-04-27 14:16:47">2026-04-27</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/03/01/TimeXer%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/" title="TimeXer代码阅读"><img src="/img/deeplearning_pic.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="TimeXer代码阅读"/></a><div class="content"><a class="title" href="/2026/03/01/TimeXer%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/" title="TimeXer代码阅读">TimeXer代码阅读</a><time datetime="2026-03-01T14:30:00.000Z" title="发表于 2026-03-01 22:30:00">2026-03-01</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/02/27/TimeXer/" title="TimeXer(NeurIPS, 2024)"><img src="/img/deeplearning_pic.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="TimeXer(NeurIPS, 2024)"/></a><div class="content"><a class="title" href="/2026/02/27/TimeXer/" title="TimeXer(NeurIPS, 2024)">TimeXer(NeurIPS, 2024)</a><time datetime="2026-02-27T11:52:59.000Z" title="发表于 2026-02-27 19:52:59">2026-02-27</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/02/26/TimeMixer/" title="TimeMixer(ICLR, 2024)"><img src="/img/deeplearning_pic.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="TimeMixer(ICLR, 2024)"/></a><div class="content"><a class="title" href="/2026/02/26/TimeMixer/" title="TimeMixer(ICLR, 2024)">TimeMixer(ICLR, 2024)</a><time datetime="2026-02-25T16:29:27.000Z" title="发表于 2026-02-26 00:29:27">2026-02-26</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/02/25/%E5%8C%BB%E5%AD%A6%E7%BB%9F%E8%AE%A1%E5%AD%A6%E4%B8%8E%E5%BE%AA%E8%AF%81%E5%8C%BB%E5%AD%A6/" title="医学统计学与循证学期末复习视频"><img src="/img/epidemic_pic.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="医学统计学与循证学期末复习视频"/></a><div class="content"><a class="title" href="/2026/02/25/%E5%8C%BB%E5%AD%A6%E7%BB%9F%E8%AE%A1%E5%AD%A6%E4%B8%8E%E5%BE%AA%E8%AF%81%E5%8C%BB%E5%AD%A6/" title="医学统计学与循证学期末复习视频">医学统计学与循证学期末复习视频</a><time datetime="2026-02-24T17:05:28.000Z" title="发表于 2026-02-25 01:05:28">2026-02-25</time></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;2019 - 2026 By Henry</span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"><script>(() => {
+  const loadMathjax = () => {
+    if (!window.MathJax) {
+      window.MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']],
+          tags: 'none',
+        },
+        chtml: {
+          scale: 1.1
+        },
+        options: {
+          enableMenu: true,
+          renderActions: {
+            findScript: [10, doc => {
+              for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+                const display = !!node.type.match(/; *mode=display/)
+                const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display)
+                const text = document.createTextNode('')
+                node.parentNode.replaceChild(text, node)
+                math.start = {node: text, delim: '', n: 0}
+                math.end = {node: text, delim: '', n: 0}
+                doc.math.push(math)
+              }
+            }, '']
+          }
+        }
+      }
+
+      const script = document.createElement('script')
+      script.src = 'https://cdn.jsdelivr.net/npm/mathjax/es5/tex-mml-chtml.min.js'
+      script.id = 'MathJax-script'
+      script.async = true
+      document.head.appendChild(script)
+    } else {
+      MathJax.startup.document.state(0)
+      MathJax.texReset()
+      MathJax.typesetPromise()
+    }
+  }
+
+  btf.addGlobalFn('encrypt', loadMathjax, 'mathjax')
+  window.pjax ? loadMathjax() : window.addEventListener('load', loadMathjax)
+})()</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索内容..." type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div></body></html>

@@ -4,6 +4,35 @@
   
     
     <entry>
+      <title>ModernNCA(ICLR, 2025)</title>
+      <link href="/2026/04/27/ModernNCA/"/>
+      <url>/2026/04/27/ModernNCA/</url>
+      
+        <content type="html"><![CDATA[<p>深度学习的方法常常从传统方法中启发而来，作者重新考虑了KNN的另外一个版本：<strong>Neightbourhood Components Analysis(NCA)</strong>。这个方法最初被用于学习线性映射器来捕捉不同样本之间的语义学相关性，作者尝试性逐步增加现代深度学习方法，并发现，使用SGD且没有降维操作的NCA方法效果已经取得了在表格数据中不错的效果。将NCA与深度表示与额外的训练随机性结合可以大大提高其准确率，达到能和CatBoost相近，超过其他已有深度学习方法的效果。</p><h1 id="Related-work"><a href="#Related-work" class="headerlink" title="Related work"></a>Related work</h1><h2 id="NCA-Variants"><a href="#NCA-Variants" class="headerlink" title="NCA  Variants"></a>NCA  Variants</h2><p>最近邻方法基于每个样本的近邻来预测。相较于传统的使用原始特征识别邻居，NCA使用了一个不同的最近邻损失函数（也被称为 soft-NN loss）来学习一个线性映射，得到更好的距离度量。已有工作改变了损失函数或者探索NCA在数据可视化中的作用。一些NCA的非线性拓展被用于图像分类并略微提升了效果（例如限制玻尔兹曼机）。对于视觉任务，soft-NN 损失函数对于深度学习表示的复杂作用曾有相关分析，且不同的损失函数已经被用在小样本学习中。NCA在图像任务中的有效性暗示着其潜力，也激发了作者开发 <em>ModernNCA</em>。</p><h2 id="Metric-Learning"><a href="#Metric-Learning" class="headerlink" title="Metric Learning"></a>Metric Learning</h2><p>NCA是一种度量学习，其映射本质上将相似样本拉近，而不同样本远离，然后使用KNN进行分类。该方法最开始便用于表格数据。尺度学习现在已经进化为一个有用的工具，尤其是当与深度学习技术结合的时候，例如：图像识别、人物识别、推荐系统领域。最近 <em>LocalPFN</em> 向 <em>TabPFN</em> 引入 <em>KNN</em> ， <em>TabR</em> 引入一个带有类Attention机制的前馈神经网络，其检索每个样本的邻居用以增强表格数据的效果。其效果虽好，但是高计算量和架构的复杂性限制了 <em>TabR</em> 的实际使用。作者在这篇文章中提出了一个相较于 <em>TabR</em> 更加简单且高效的模型。</p><h1 id="Preliminary"><a href="#Preliminary" class="headerlink" title="Preliminary"></a>Preliminary</h1><h2 id="NCA"><a href="#NCA" class="headerlink" title="NCA"></a>NCA</h2><p><em>NCA</em> 关注于分类任务，依据 1NN 准则，<em>NCA</em> 定义了 $x_{j}$ 为 $x_{i}$ 邻居的概率(Equation 1)：<br>$$<br>Pr({x}_j \in \mathcal{N}({x}_i; \mathcal{D}) \mid {x}_i, \mathcal{D}, {L}) &#x3D; \frac{\exp \left(-\operatorname{dist}^2({L}^{\top} {x}_i, {L}^{\top} {x}_j)\right)}{\sum_{({x}_l, y_l) \in \mathcal{D}, {x}_l \neq {x}_i} \exp \left(-\operatorname{dist}^2({L}^{\top} {x}_i, {L}^{\top} {x}_l)\right)}<br>$$<br>$x_{i}$ 被分为类别 $y_{i}$ 的概率为(Equation 2)：<br>$$<br>Pr(\hat{y}_i &#x3D; y_i \mid \boldsymbol{x}_i, \mathcal{D}, \boldsymbol{L}) &#x3D; \sum_{(\boldsymbol{x}_j, y_j) \in \mathcal{D} \wedge y_j &#x3D; y_i} \Pr(\boldsymbol{x}_j \in \mathcal{N}(\boldsymbol{x}_i; \mathcal{D}) \mid \boldsymbol{x}_i, \mathcal{D}, \boldsymbol{L})<br>$$<br>$\boldsymbol{L}\in \mathbb{R}^{d\times d’}$ 是一个线性映射，且 $d’$ 常常小于等于 $d$。这样可以实现原始输入的降维操作。最初的 <em>NCA</em> 最大化 $Pr(\hat{y}_i &#x3D; y_i \mid \boldsymbol{x}_i, \mathcal{D}, \boldsymbol{L})$ 之和。相较于均等的考虑所有最近邻的样本，该方法是一个 软间隔方法的KNN。</p><h2 id="TabR"><a href="#TabR" class="headerlink" title="TabR"></a>TabR</h2><p><em>TabR</em> 识别在嵌入空间中 K 最近邻并如下定义每个近邻的贡献 $(\boldsymbol{x}_{i}, y_{i})$: $s(\boldsymbol{x}_{i}, \boldsymbol{x}_{j}, y_{j}) &#x3D; \boldsymbol{W}\boldsymbol{y}_{j}+T(\boldsymbol{L}^TE(\boldsymbol{x}_{j})-\boldsymbol{L}^TE(\boldsymbol{x}_{i}))$<br>。此处，T是一个转换层，由线性层、dropout、ReLU、与另一个线性层构成。$E$ 代表 <em>TabR</em> 的嵌入模块， $\boldsymbol{W}$ 为线性层，$\boldsymbol{y}_{i}$ 为编码后的 $y_{i}$。随后逐样本打分如下计算 $R(\boldsymbol{x}_j, y_j, \boldsymbol{x}_i) &#x3D; \sum_{(\boldsymbol{x}_j, y_j) \in \mathcal{D}} \alpha_j \cdot s(\boldsymbol{x}_i, \boldsymbol{x}_j, y_j)$，其中$\alpha_{j}$如下定义：$\alpha_j \propto {-\operatorname{dist}(\boldsymbol{L}^{\top} E(\boldsymbol{x}_j), \boldsymbol{L}^{\top} E(\boldsymbol{x}_i))}$ 并使用一个 softmax 函数进行归一化。然后该分数将会与 $E(\boldsymbol{x}_{i})$ 相加并输入到预测模块中获取 $\hat{y}_{i}$。</p><h1 id="ModernNCA"><a href="#ModernNCA" class="headerlink" title="ModernNCA"></a>ModernNCA</h1><p>考虑到初始 <em>TabR</em> 的有效结果，作者考虑将最原始的 <em>NCA</em> 作为起点并逐步增加复杂性。该研究策略遵循奥卡姆剃刀原则，让作者更能识别出该方法在表格数据中展现优秀表现的主要因素。作者有以下2个主要尝试。</p><h2 id="The-First-Attempt"><a href="#The-First-Attempt" class="headerlink" title="The First Attempt"></a>The First Attempt</h2><p>作者对于等式1进行推广，采用转换函数 $\phi$ 替代 $\boldsymbol{L}$ 来进行映射。为了和 <em>NCA</em> 保持一致性，作者一开始定义 $\phi$ 为线性层。</p><h3 id="Learning-Objective"><a href="#Learning-Objective" class="headerlink" title="Learning Objective"></a>Learning Objective</h3><p>假设，$y_{i}$ 在回归任务中连续，分类任务中为one-hot编码。作者如下修改 等式2<br>$$<br>\hat{y}_i &#x3D; \sum_{(\boldsymbol{x}_j, y_j) \in \mathcal{D}} \frac{\exp \left(-\operatorname{dist}^2(\phi(\boldsymbol{x}_i), \phi(\boldsymbol{x}_j))\right)}{\sum_{(\boldsymbol{x}_l, y_l) \in \mathcal{D}, \boldsymbol{x}_l \neq \boldsymbol{x}_i} \exp \left(-\operatorname{dist}^2(\phi(\boldsymbol{x}_i), \phi(\boldsymbol{x}_l))\right)} y_j .<br>$$<br>这里对于分类问题，$\hat{y}_{i}\in \mathbb{R}^C$ 为概率向量表示 ${ \text{Pr}(\hat{y}_{i}&#x3D;c | \boldsymbol{x}_{i},\mathcal{D}, \phi ) }_{c\in[C]}$。<br>该Loss function也被称为 soft Nearest Neighbor(soft-NN). 相较于之前NCA所使用的概率和，作者采用对数概率之和效果更好。</p><h3 id="Prediction-Strategy"><a href="#Prediction-Strategy" class="headerlink" title="Prediction Strategy"></a>Prediction Strategy</h3><p>作者在计算时使用 $\text{SGD}$ 替代 $\text{L-BFGS}$ 优化器发现效果更加好。<strong>这个改进让NCA达到了和MLP等深度模型相匹敌的能力</strong></p><h2 id="The-Second-Attempt"><a href="#The-Second-Attempt" class="headerlink" title="The Second Attempt"></a>The Second Attempt</h2><h3 id="架构"><a href="#架构" class="headerlink" title="架构"></a>架构</h3><p>为了向模型中引入非线性，作者首先向 $\phi$ 引入多个非线性层，包括一个批归一化、一个线性层、ReLU激活函数、dropout和另外一个线性层。<br>$$<br>g(\boldsymbol{x}_i) &#x3D; \text{Linear} \left( \text{Dropout} \left( \text{ReLU} \left( \text{Linear} \left( \text{BatchNorm} \left( \boldsymbol{x}_i \right) \right) \right) \right) \right)<br>$$</p><h3 id="Stochastic-Neighborhood-Sampling"><a href="#Stochastic-Neighborhood-Sampling" class="headerlink" title="Stochastic Neighborhood Sampling"></a>Stochastic Neighborhood Sampling</h3><p>loss函数计算过程中由于需要计算两两样本间的距离，所以作者提出了一种加速方法，叫随机近邻采样方法(SNS)，该方法将会从训练集合$\mathcal{D}$ 中采样出 $\hat{\mathcal{D}}$，并只计算该子集中的样本。但是在测试过程中则会从整个训练集合中进行检索。<br>该方法不仅仅提高了训练效率，同时还提高了模型的泛化能力。</p><h3 id="Distance-Function"><a href="#Distance-Function" class="headerlink" title="Distance Function"></a>Distance Function</h3><p>作者使用欧几里得距离作为距离函数。</p><h1 id="Analysis-and-Ablation-Studies-of-ModernNCA"><a href="#Analysis-and-Ablation-Studies-of-ModernNCA" class="headerlink" title="Analysis and Ablation Studies of ModernNCA"></a>Analysis and Ablation Studies of ModernNCA</h1><h3 id="映射到高维空间是否有效"><a href="#映射到高维空间是否有效" class="headerlink" title="映射到高维空间是否有效"></a>映射到高维空间是否有效</h3><p><em>NCA</em> 设计时便限制 $d’\leq d$，在实验中作者将这个限制取消，虽然高维的映射并没有本质上提高表示能力，但是平均的准确率提升暗示高维度空间可能会帮助非凸问题的优化并提高泛化性。</p><h3 id="SGD是否有效"><a href="#SGD是否有效" class="headerlink" title="SGD是否有效"></a>SGD是否有效</h3><p>SGD相较于L-BFGS效果会更加好。</p><hr><p>Cover image icon by <a href="https://www.flaticon.com/free-icons/inference" title="inference icons">Dewi Sari</a> from <a href="https://www.flaticon.com/free-icons/inference" title="inference icons">Flaticon</a></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 机器学习 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 深度学习 </tag>
+            
+            <tag> 论文阅读 </tag>
+            
+            <tag> 时间序列 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>TimeXer代码阅读</title>
       <link href="/2026/03/01/TimeXer%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/"/>
       <url>/2026/03/01/TimeXer%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/</url>
