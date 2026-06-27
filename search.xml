@@ -4,6 +4,33 @@
   
     
     <entry>
+      <title>MIRA</title>
+      <link href="/2026/06/27/MIRA/"/>
+      <url>/2026/06/27/MIRA/</url>
+      
+        <content type="html"><![CDATA[<p><a href="https://www.nature.com/articles/s41586-026-10675-5#Abs1">MIRA</a> 是一项非常新的工作，于 2026 年 5 月 18 日接收。文章提出了 MIRA（Medical Intelligence for Reasoning and Action），这是一个能够在沙盒化 EHR 环境中模拟医生工作流的医疗智能体。它可以采集病史、开具化验、影像和微生物检查，解释检查结果，形成鉴别诊断，并进一步给出用药、手术、入院等治疗计划。研究报告称，在基于真实病历的模拟评估中，MIRA 的诊断准确率和部分管理决策优于医生组。不过，作者也明确强调，这类系统仍需要经过前瞻性的真实世界验证，并建立相应的安全、治理和监管框架。</p><h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>近年来，健康医疗领域已经出现了多项关于 AI Agent 的研究：从基于 FHIR 规范的电子病历交互，到模拟医疗决策的 benchmark，相关工作正在逐步覆盖临床流程中的不同环节。例如，AMIE 是一个面向医患交流设计的问诊模型；MAI-DxO 则是一个面向复杂病例的多智能体诊断系统。在实际临床应用中，OpenAI 与 Penda Health 也构建过一个“非自主式”的安全兜底助手，并将其嵌入基层医疗和初级保健工作流。</p><p>不过，当前的医疗 AI 系统仍有两个核心问题没有被充分解决。第一，AI 与既有临床工作流之间仍然存在融合 gap；第二，AI 的安全性和能力表现尚未在完整的患者诊疗流程中得到系统评估。MIRA 正是针对这两个问题提出的：它不只回答单个医学问题，而是尝试在一个可控的临床沙盒中完成连续的推理与行动。</p><h1 id="MIRA-概述"><a href="#MIRA-概述" class="headerlink" title="MIRA 概述"></a>MIRA 概述</h1><p>为了解决上述问题，作者提出了 MIRA，一个全自动的医疗 AI Agent。它可以在可控的虚拟沙盒 EHR 环境中操作，并模拟真实医生的诊疗流程。研究者在 MIMIC-IV 数据库中抽取了 500 个病例进行评估，这些病例覆盖内科、外科和肿瘤科的诊断与治疗决策。</p><p>MIRA 会与一个严格遵照病史设定的 Patient Agent 进行交流，并调用 11 类工具。整体系统需要在总计约 85000 个可选操作中进行选择，用于解释实验室检查、微生物检查和影像学检查，生成诊断假设，并制定可执行的治疗计划，包括安排日程、开具药物和安排住院。换句话说，MIRA 面对的不是一个简单的问答任务，而是一个接近真实临床流程的连续决策空间。</p><p>在实现层面，MIRA 的操作同时符合 FHIR 标准以及六套医学编码系统的要求，包括 International Classification of Diseases（ICD）、Logical Observation Identifiers Names and Codes（LOINC）、Anatomical Therapeutic Chemical（ATC）、National Drug Code（NDC）、RxNorm 和 SNOMED-CT。</p><p>为了评价模型效果，作者将 MIRA 与两个医生队列进行比较：一个由 4 名认证医生组成，另一个由 4 名住院医生和 2 名持证医师组成。结果显示，MIRA 在多项指标上达到或优于这两个医生队列。</p><h1 id="患者智能体的鲁棒性与一致性"><a href="#患者智能体的鲁棒性与一致性" class="headerlink" title="患者智能体的鲁棒性与一致性"></a>患者智能体的鲁棒性与一致性</h1><p>Patient Agent 在整个临床决策过程中非常关键。它需要满足三个要求：第一，面对语义相同但表达不同的问题时提供稳定答案；第二，回答必须忠于现病史（history of present illness, HPI）；第三，不能泄露最终诊断结论。</p><p>为了验证 Patient Agent 回复的稳定性与可信度，作者从 MIRA 与 Patient Agent 的交流、医生队列与 Patient Agent 的交流中采样语句，并对相同语义的问题进行不同表述。在 622 个问答样本中，Patient Agent 在 99.4% 的案例里给出了与原始答案语义一致的回复，并且回答仍然与现病史保持一致。原始问题下的病史一致率为 99.3%，改写问题后的病史一致率为 99.1%。一个独立 LLM 裁判也得出了相似结果。</p><p>总体来看，Patient Agent 在这套评估中表现出较高的一致性和可用性。作者进一步检查后，也没有发现诊断结论被泄露给交互方的情况。</p><h1 id="MIRA-的效果"><a href="#MIRA-的效果" class="headerlink" title="MIRA 的效果"></a>MIRA 的效果</h1><p>作者首先将 MIRA 预测的诊断结果与 MIMIC-IV 数据库中的出院 ICD 诊断进行比较，以评估它的诊断性能。整体来看，MIRA 在 8 类疾病上的诊断准确率达到 88.9%。其中，阑尾炎的准确率最高，为 98.6%；胰腺炎为 92.3%；肺炎和泌尿道感染的准确率相对较低，分别为 72.4% 和 77.6%。</p><p>考虑到真实病历中可能存在未记录信息，作者又设计了额外实验，以避免诊断准确率被缺失数据显著低估。结果显示，在部分场景中，专业医生队列的准确率与 MIRA 持平，有时甚至低于 MIRA。</p><img src="/2026/06/27/MIRA/Precision.png" class="" title="MIRA 诊断准确率"><h2 id="模拟医生工作流"><a href="#模拟医生工作流" class="headerlink" title="模拟医生工作流"></a>模拟医生工作流</h2><p>MIRA 最主要的创新点之一，是它不只进行诊断推理，还能够模拟医生在临床流程中的行动能力，尤其体现在开具检查和制定治疗方案上。</p><p>在检查策略上，MIRA 开具的检查更接近真实病历中的检查分布。它尤其偏好血液检查，开具数量明显多于人类医生，但仍低于 MIMIC-IV 真实记录中的血液检查数量。对于微生物检查，人类医生与 MIRA 的开具数量没有显著差异；而人类医生相对更倾向于开具影像学检查。</p><p>从重合度来看，MIMIC-IV 与 MIRA 的检查项目只有 55.3% 相同；执业医师队列与混合医生队列的对应比例分别为 61.5% 和 62.5%。这说明更高的实验室检查覆盖率，并不必然意味着更高成本的过度影像学检查。综合来看，MIRA 能够在使用较少检验的基础上获得较高的诊断准确率。</p><p>由于用药核对是急诊入院接诊中的核心任务，研究者还额外评估了 MIRA 是否能够询问并记录患者入院前，也就是居家期间正在使用的药物，并将这些药物以结构化条目的形式写入电子健康记录。与 MIMIC-IV 中的用药核对记录相比，MIRA 在“药物名称”层面达到了 95.2% 的召回率和 99.6% 的精确率。</p><h2 id="推荐正确干预手段"><a href="#推荐正确干预手段" class="headerlink" title="推荐正确干预手段"></a>推荐正确干预手段</h2><p>总体来看，研究结果表明，MIRA 不仅能够在 ICD 编码层面较可靠地推荐临床有效的治疗干预，而且这些建议与既有临床实践保持较高一致性。在相同评估条件下，MIRA 请求或推荐参考操作的比例也高于实验中的医生组。</p><h1 id="MIRA-Pipeline"><a href="#MIRA-Pipeline" class="headerlink" title="MIRA Pipeline"></a>MIRA Pipeline</h1><p>MIRA 的整体流程可以概括为以下几个部分：</p><ol><li>使用 FHIR 进行信息传递，使系统能够与结构化电子健康记录交互。</li><li>对所有检查进行输入和输出校验，限制无效请求或失败检查结果，避免生成不符合临床约束的信息。</li><li>使用 ChatGPT o1 系列模型，在最终响应前生成用于推理和规划的中间输出。</li><li>每段对话都从结构化初始化开始。MIRA 会收到提示：“你现在接诊的患者主要症状是：{primary_symptom}”。该症状来自分诊患者的主诉，类似真实临床场景中患者在分诊台接受评估并说明就诊原因。</li><li>在交互过程中，MIRA 要么生成对患者的适当回应，要么判断是否需要外部资源。当某个临床工具被认为必要时，系统会自动执行对应函数，将请求提交给医院服务器，并把返回结果整合进当前对话。</li><li>为了维持临床连贯性并确保交互过程有限，Admission 工具既用于生成最终工作诊断假设，也作为终止交互的节点。此外，为防止两个 AI 系统之间出现无限对话循环，研究者设置了 20 轮对话限制。达到阈值后，MIRA 会被要求在下一轮结束对话，并在随后强制使用 Admission 工具。</li></ol><p>医生智能体使用 GPT-4o 实现，temperature 设置为 0.01。具体问诊 prompt 如下：</p><img src="/2026/06/27/MIRA/prompt1.png" class="" title="问诊 Prompt 示例 1"><img src="/2026/06/27/MIRA/prompt2.png" class="" title="问诊 Prompt 示例 2"><img src="/2026/06/27/MIRA/prompt3.png" class="" title="问诊 Prompt 示例 3"><h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><p>MIRA 的价值不只在于提高某个静态诊断任务上的准确率，而在于它把医疗 AI 的评估对象推进到了“完整工作流”层面。它需要持续获取信息、调用工具、解释结果、形成诊断，并最终给出治疗计划。这种设定更接近真实临床实践，也更能暴露医疗智能体在安全性、稳定性、可控性和责任边界上的问题。</p><p>当然，MIRA 仍然运行在沙盒环境中，距离真实临床部署还有明显距离。未来这类系统要进入实际医疗场景，仍然需要前瞻性研究、真实世界验证，以及更明确的人机协作、监管和安全框架。</p><hr><p>Cover image icon by <a href="https://www.flaticon.com/free-icons/inference" title="inference icons">Dewi Sari</a> from <a href="https://www.flaticon.com/free-icons/inference" title="inference icons">Flaticon</a></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 大语言模型技巧 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 论文阅读 </tag>
+            
+            <tag> Agent </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>ModernNCA(ICLR, 2025)</title>
       <link href="/2026/04/27/ModernNCA/"/>
       <url>/2026/04/27/ModernNCA/</url>

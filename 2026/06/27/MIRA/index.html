@@ -1,0 +1,246 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>MIRA | Evanescence's Blog</title><meta name="author" content="Henry"><meta name="copyright" content="Henry"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="ffffff"><meta name="description" content="MIRA 是一项非常新的工作，于 2026 年 5 月 18 日接收。文章提出了 MIRA（Medical Intelligence for Reasoning and Action），这是一个能够在沙盒化 EHR 环境中模拟医生工作流的医疗智能体。它可以采集病史、开具化验、影像和微生物检查，解释检查结果，形成鉴别诊断，并进一步给出用药、手术、入院等治疗计划。研究报告称，在基于真实病历的模拟评估中">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MIRA">
+<meta property="og:url" content="http://evanescence0515.github.io/2026/06/27/MIRA/index.html">
+<meta property="og:site_name" content="Evanescence&#39;s Blog">
+<meta property="og:description" content="MIRA 是一项非常新的工作，于 2026 年 5 月 18 日接收。文章提出了 MIRA（Medical Intelligence for Reasoning and Action），这是一个能够在沙盒化 EHR 环境中模拟医生工作流的医疗智能体。它可以采集病史、开具化验、影像和微生物检查，解释检查结果，形成鉴别诊断，并进一步给出用药、手术、入院等治疗计划。研究报告称，在基于真实病历的模拟评估中">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://evanescence0515.github.io/img/deeplearning_pic.png">
+<meta property="article:published_time" content="2026-06-27T05:12:18.000Z">
+<meta property="article:modified_time" content="2026-06-27T05:12:18.000Z">
+<meta property="article:author" content="Henry">
+<meta property="article:tag" content="论文阅读">
+<meta property="article:tag" content="Agent">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://evanescence0515.github.io/img/deeplearning_pic.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "MIRA",
+  "url": "http://evanescence0515.github.io/2026/06/27/MIRA/",
+  "image": "http://evanescence0515.github.io/img/deeplearning_pic.png",
+  "datePublished": "2026-06-27T05:12:18.000Z",
+  "dateModified": "2026-06-27T05:12:18.000Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Henry",
+      "url": "http://evanescence0515.github.io"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://evanescence0515.github.io/2026/06/27/MIRA/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', 'ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"未找到符合您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'MIRA',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg" style="background-color: #EEEEEE;"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/my_icon.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">45</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">15</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">6</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> List</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/tools/"><i class="fa-fw fas fa-tools"></i><span> Tools</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/deeplearning_pic.png);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Evanescence's Blog</span></a><a class="nav-page-title" href="/"><span class="site-name">MIRA</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> List</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/tools/"><i class="fa-fw fas fa-tools"></i><span> Tools</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">MIRA</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2026-06-27T05:12:18.000Z" title="发表于 2026-06-27 13:12:18">2026-06-27</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-06-27T05:12:18.000Z" title="更新于 2026-06-27 13:12:18">2026-06-27</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E5%A4%A7%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E6%8A%80%E5%B7%A7/">大语言模型技巧</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><p><a target="_blank" rel="noopener" href="https://www.nature.com/articles/s41586-026-10675-5#Abs1">MIRA</a> 是一项非常新的工作，于 2026 年 5 月 18 日接收。文章提出了 MIRA（Medical Intelligence for Reasoning and Action），这是一个能够在沙盒化 EHR 环境中模拟医生工作流的医疗智能体。它可以采集病史、开具化验、影像和微生物检查，解释检查结果，形成鉴别诊断，并进一步给出用药、手术、入院等治疗计划。研究报告称，在基于真实病历的模拟评估中，MIRA 的诊断准确率和部分管理决策优于医生组。不过，作者也明确强调，这类系统仍需要经过前瞻性的真实世界验证，并建立相应的安全、治理和监管框架。</p>
+<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>近年来，健康医疗领域已经出现了多项关于 AI Agent 的研究：从基于 FHIR 规范的电子病历交互，到模拟医疗决策的 benchmark，相关工作正在逐步覆盖临床流程中的不同环节。例如，AMIE 是一个面向医患交流设计的问诊模型；MAI-DxO 则是一个面向复杂病例的多智能体诊断系统。在实际临床应用中，OpenAI 与 Penda Health 也构建过一个“非自主式”的安全兜底助手，并将其嵌入基层医疗和初级保健工作流。</p>
+<p>不过，当前的医疗 AI 系统仍有两个核心问题没有被充分解决。第一，AI 与既有临床工作流之间仍然存在融合 gap；第二，AI 的安全性和能力表现尚未在完整的患者诊疗流程中得到系统评估。MIRA 正是针对这两个问题提出的：它不只回答单个医学问题，而是尝试在一个可控的临床沙盒中完成连续的推理与行动。</p>
+<h1 id="MIRA-概述"><a href="#MIRA-概述" class="headerlink" title="MIRA 概述"></a>MIRA 概述</h1><p>为了解决上述问题，作者提出了 MIRA，一个全自动的医疗 AI Agent。它可以在可控的虚拟沙盒 EHR 环境中操作，并模拟真实医生的诊疗流程。研究者在 MIMIC-IV 数据库中抽取了 500 个病例进行评估，这些病例覆盖内科、外科和肿瘤科的诊断与治疗决策。</p>
+<p>MIRA 会与一个严格遵照病史设定的 Patient Agent 进行交流，并调用 11 类工具。整体系统需要在总计约 85000 个可选操作中进行选择，用于解释实验室检查、微生物检查和影像学检查，生成诊断假设，并制定可执行的治疗计划，包括安排日程、开具药物和安排住院。换句话说，MIRA 面对的不是一个简单的问答任务，而是一个接近真实临床流程的连续决策空间。</p>
+<p>在实现层面，MIRA 的操作同时符合 FHIR 标准以及六套医学编码系统的要求，包括 International Classification of Diseases（ICD）、Logical Observation Identifiers Names and Codes（LOINC）、Anatomical Therapeutic Chemical（ATC）、National Drug Code（NDC）、RxNorm 和 SNOMED-CT。</p>
+<p>为了评价模型效果，作者将 MIRA 与两个医生队列进行比较：一个由 4 名认证医生组成，另一个由 4 名住院医生和 2 名持证医师组成。结果显示，MIRA 在多项指标上达到或优于这两个医生队列。</p>
+<h1 id="患者智能体的鲁棒性与一致性"><a href="#患者智能体的鲁棒性与一致性" class="headerlink" title="患者智能体的鲁棒性与一致性"></a>患者智能体的鲁棒性与一致性</h1><p>Patient Agent 在整个临床决策过程中非常关键。它需要满足三个要求：第一，面对语义相同但表达不同的问题时提供稳定答案；第二，回答必须忠于现病史（history of present illness, HPI）；第三，不能泄露最终诊断结论。</p>
+<p>为了验证 Patient Agent 回复的稳定性与可信度，作者从 MIRA 与 Patient Agent 的交流、医生队列与 Patient Agent 的交流中采样语句，并对相同语义的问题进行不同表述。在 622 个问答样本中，Patient Agent 在 99.4% 的案例里给出了与原始答案语义一致的回复，并且回答仍然与现病史保持一致。原始问题下的病史一致率为 99.3%，改写问题后的病史一致率为 99.1%。一个独立 LLM 裁判也得出了相似结果。</p>
+<p>总体来看，Patient Agent 在这套评估中表现出较高的一致性和可用性。作者进一步检查后，也没有发现诊断结论被泄露给交互方的情况。</p>
+<h1 id="MIRA-的效果"><a href="#MIRA-的效果" class="headerlink" title="MIRA 的效果"></a>MIRA 的效果</h1><p>作者首先将 MIRA 预测的诊断结果与 MIMIC-IV 数据库中的出院 ICD 诊断进行比较，以评估它的诊断性能。整体来看，MIRA 在 8 类疾病上的诊断准确率达到 88.9%。其中，阑尾炎的准确率最高，为 98.6%；胰腺炎为 92.3%；肺炎和泌尿道感染的准确率相对较低，分别为 72.4% 和 77.6%。</p>
+<p>考虑到真实病历中可能存在未记录信息，作者又设计了额外实验，以避免诊断准确率被缺失数据显著低估。结果显示，在部分场景中，专业医生队列的准确率与 MIRA 持平，有时甚至低于 MIRA。</p>
+<img src="/2026/06/27/MIRA/Precision.png" class="" title="MIRA 诊断准确率">
+
+<h2 id="模拟医生工作流"><a href="#模拟医生工作流" class="headerlink" title="模拟医生工作流"></a>模拟医生工作流</h2><p>MIRA 最主要的创新点之一，是它不只进行诊断推理，还能够模拟医生在临床流程中的行动能力，尤其体现在开具检查和制定治疗方案上。</p>
+<p>在检查策略上，MIRA 开具的检查更接近真实病历中的检查分布。它尤其偏好血液检查，开具数量明显多于人类医生，但仍低于 MIMIC-IV 真实记录中的血液检查数量。对于微生物检查，人类医生与 MIRA 的开具数量没有显著差异；而人类医生相对更倾向于开具影像学检查。</p>
+<p>从重合度来看，MIMIC-IV 与 MIRA 的检查项目只有 55.3% 相同；执业医师队列与混合医生队列的对应比例分别为 61.5% 和 62.5%。这说明更高的实验室检查覆盖率，并不必然意味着更高成本的过度影像学检查。综合来看，MIRA 能够在使用较少检验的基础上获得较高的诊断准确率。</p>
+<p>由于用药核对是急诊入院接诊中的核心任务，研究者还额外评估了 MIRA 是否能够询问并记录患者入院前，也就是居家期间正在使用的药物，并将这些药物以结构化条目的形式写入电子健康记录。与 MIMIC-IV 中的用药核对记录相比，MIRA 在“药物名称”层面达到了 95.2% 的召回率和 99.6% 的精确率。</p>
+<h2 id="推荐正确干预手段"><a href="#推荐正确干预手段" class="headerlink" title="推荐正确干预手段"></a>推荐正确干预手段</h2><p>总体来看，研究结果表明，MIRA 不仅能够在 ICD 编码层面较可靠地推荐临床有效的治疗干预，而且这些建议与既有临床实践保持较高一致性。在相同评估条件下，MIRA 请求或推荐参考操作的比例也高于实验中的医生组。</p>
+<h1 id="MIRA-Pipeline"><a href="#MIRA-Pipeline" class="headerlink" title="MIRA Pipeline"></a>MIRA Pipeline</h1><p>MIRA 的整体流程可以概括为以下几个部分：</p>
+<ol>
+<li>使用 FHIR 进行信息传递，使系统能够与结构化电子健康记录交互。</li>
+<li>对所有检查进行输入和输出校验，限制无效请求或失败检查结果，避免生成不符合临床约束的信息。</li>
+<li>使用 ChatGPT o1 系列模型，在最终响应前生成用于推理和规划的中间输出。</li>
+<li>每段对话都从结构化初始化开始。MIRA 会收到提示：“你现在接诊的患者主要症状是：{primary_symptom}”。该症状来自分诊患者的主诉，类似真实临床场景中患者在分诊台接受评估并说明就诊原因。</li>
+<li>在交互过程中，MIRA 要么生成对患者的适当回应，要么判断是否需要外部资源。当某个临床工具被认为必要时，系统会自动执行对应函数，将请求提交给医院服务器，并把返回结果整合进当前对话。</li>
+<li>为了维持临床连贯性并确保交互过程有限，Admission 工具既用于生成最终工作诊断假设，也作为终止交互的节点。此外，为防止两个 AI 系统之间出现无限对话循环，研究者设置了 20 轮对话限制。达到阈值后，MIRA 会被要求在下一轮结束对话，并在随后强制使用 Admission 工具。</li>
+</ol>
+<p>医生智能体使用 GPT-4o 实现，temperature 设置为 0.01。具体问诊 prompt 如下：</p>
+<img src="/2026/06/27/MIRA/prompt1.png" class="" title="问诊 Prompt 示例 1">
+
+<img src="/2026/06/27/MIRA/prompt2.png" class="" title="问诊 Prompt 示例 2">
+
+<img src="/2026/06/27/MIRA/prompt3.png" class="" title="问诊 Prompt 示例 3">
+
+<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><p>MIRA 的价值不只在于提高某个静态诊断任务上的准确率，而在于它把医疗 AI 的评估对象推进到了“完整工作流”层面。它需要持续获取信息、调用工具、解释结果、形成诊断，并最终给出治疗计划。这种设定更接近真实临床实践，也更能暴露医疗智能体在安全性、稳定性、可控性和责任边界上的问题。</p>
+<p>当然，MIRA 仍然运行在沙盒环境中，距离真实临床部署还有明显距离。未来这类系统要进入实际医疗场景，仍然需要前瞻性研究、真实世界验证，以及更明确的人机协作、监管和安全框架。</p>
+<hr>
+
+<p>Cover image icon by <a target="_blank" rel="noopener" href="https://www.flaticon.com/free-icons/inference" title="inference icons">Dewi Sari</a> from <a target="_blank" rel="noopener" href="https://www.flaticon.com/free-icons/inference" title="inference icons">Flaticon</a></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://evanescence0515.github.io">Henry</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://evanescence0515.github.io/2026/06/27/MIRA/">http://evanescence0515.github.io/2026/06/27/MIRA/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="http://evanescence0515.github.io" target="_blank">Evanescence's Blog</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/">论文阅读</a><a class="post-meta__tags" href="/tags/Agent/">Agent</a></div><div class="post-share"><div class="social-share" data-image="/img/deeplearning_pic.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related full-width" href="/2026/04/27/ModernNCA/" title="ModernNCA(ICLR, 2025)"><img class="cover" src="/img/deeplearning_pic.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">ModernNCA(ICLR, 2025)</div></div><div class="info-2"><div class="info-item-1">深度学习的方法常常从传统方法中启发而来，作者重新考虑了KNN的另外一个版本：Neightbourhood Components Analysis(NCA)。这个方法最初被用于学习线性映射器来捕捉不同样本之间的语义学相关性，作者尝试性逐步增加现代深度学习方法，并发现，使用SGD且没有降维操作的NCA方法效果已经取得了在表格数据中不错的效果。将NCA与深度表示与额外的训练随机性结合可以大大提高其准确率，达到能和CatBoost相近，超过其他已有深度学习方法的效果。 Related workNCA  Variants最近邻方法基于每个样本的近邻来预测。相较于传统的使用原始特征识别邻居，NCA使用了一个不同的最近邻损失函数（也被称为 soft-NN loss）来学习一个线性映射，得到更好的距离度量。已有工作改变了损失函数或者探索NCA在数据可视化中的作用。一些NCA的非线性拓展被用于图像分类并略微提升了效果（例如限制玻尔兹曼机）。对于视觉任务，soft-NN 损失函数对于深度学习表示的复杂作用曾有相关分析，且不同的损失函数已经被用在小样本学习中。NCA在图像任务中的有效性暗示着其潜力，也...</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2025/09/21/Attic/" title="Attic速读(ICLR under review, 2025)"><img class="cover" src="/img/deeplearning_pic.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-09-21</div><div class="info-item-2">Attic速读(ICLR under review, 2025)</div></div><div class="info-2"><div class="info-item-1">作者在TabPFN的基础上作出了一个改进，准确率相较于TabPFN有相对较大的提升。相较于TabPFN对每个样本给出一个token，Attic选择将样本中每个特征均给出一个token，这在一定程度上解决了TabPFN所出现的“特征顺序不变性”的问题，提升了表格深度学习模型表现。 要点速递 Cell Tokens：即对于每个样本的每个特征均给出一个tokens，该想法并非作者独创，于SAINT(2021, NeurIPS Workshop)中便提及并使用，同时对于每个特征给出tokens(FT-Transformer, 2021, NeurIPS)和对于每个样本(TabPFN, 2023, ICLR)给出tokens的想法也均在之前的论文中提出并实践。但是并没有哪个方法格外优秀，这次作者的尝试证明使用单元格级别的tokens可以更加有效捕捉合成数据的相关性。 模型精度：作者尝试选用float16取代bfloat16，但是在预训练中失败了。float16代表更高精度和更小的范围，而bfloat16有精度较低而范围大。作者选择float16的原因很简单，高精度模型的测试确实准确率更高，...</div></div></div></a><a class="pagination-related" href="/2025/07/31/AutoPNPNet%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/" title="AutoPNPNet论文阅读"><img class="cover" src="/img/deeplearning_pic.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-07-31</div><div class="info-item-2">AutoPNPNet论文阅读</div></div><div class="info-2"><div class="info-item-1">模型速览 PNPNet(Periodic-Non-Periodic Network)和AutoPNPNet是作者提出的深度学习模型，用于挖掘数据内部的周期性来增强预测准确率。作者提出了FourierNet：一种基于Fourier的神经编码器来捕捉周期性特征；ChebyshevNet：使用Chebyshev神经编码器来建模非周期性特征。作者将这两种架构结合构成PNPNet和AutoPNPNet。模型效果优于SOTA（会有论文不是SOTA的吗？而且这里的SOTA是FT-Transformer(2021, Yury Gorishniy)）。   PNPNet detects periodic and non-periodic features a priori, feeding them into separate branches, while AutoPNPNet automatically selects features through a learned mechanism.   Q1：PNPNet如何使用滤波器与傅里叶变换获取periodic and non-periodi...</div></div></div></a><a class="pagination-related" href="/2025/12/15/GCN-lesson2/" title="torch geometric学习笔记2(MessagePassing)"><img class="cover" src="/img/deeplearning_pic.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-12-15</div><div class="info-item-2">torch geometric学习笔记2(MessagePassing)</div></div><div class="info-2"><div class="info-item-1">torch_geometric官方教程该笔记主要参考：Creating Message Passing Networks — pytorch_geometric documentationMessagePassing功能是图神经网络区别于其他网络的重要部分，其给图神经网络提供了一种信息传递的功能，从某种程度上讲，MessagePassing就是一种特殊的卷积操作，让不同节点的数据相互交流。将卷积操作泛化到不规则的域被称为聚合或者信息传递。对于$\mathbf{x}_{i}^{(k-1)}\in \mathbb{R}^F$，其代表k-1层的节点 i .$\mathbf{e}_{j,i}\in \mathbb{R}^D$代表从节点 j 到节点 i 的边。信息传递可以表示为如下：$$\mathbf{x}_{i}^{(k)}&#x3D;\gamma^{(k)}\left(\mathbf{x}_{i}^{(k-1)}, \bigoplus_{j \in \mathcal{N}(i)} \phi^{(k)}\left(\mathbf{x}_{i}^{(k-1)}, \mathbf{x}_{j...</div></div></div></a><a class="pagination-related" href="/2026/01/12/GSSG/" title="GSSG论文阅读"><img class="cover" src="/img/deeplearning_pic.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-01-12</div><div class="info-item-2">GSSG论文阅读</div></div><div class="info-2"><div class="info-item-1">有源码kkdey&#x2F;GSSG: Gene Set + S2G strategy annotations analyzed for disease architecture 简介GSSG : Combine SNP-gene linking strategy with Gene Sets A pipeline to perform the following steps.  Generate gene programs for analysis Link SNPs to genes in a gene program to generate a genome-wide annotation Perform disease heritability enrichment analysis using S-LDSC这里我们将主要关注其第二篇文章的工作：将GWAS数据与scRNA结合以识别细胞种类和细胞过程(Identifying disease-critical cell types and cellular processes by integrating single-ce...</div></div></div></a><a class="pagination-related" href="/2025/12/15/MSHTrans%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/" title="MSHTrans代码阅读与模块解读(KDD, 2025)"><img class="cover" src="/img/deeplearning_pic.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-12-15</div><div class="info-item-2">MSHTrans代码阅读与模块解读(KDD, 2025)</div></div><div class="info-2"><div class="info-item-1">深度学习代码一般有一个固定的架构，所以在阅读过程中常遵循一个固定的顺序，故我在该文章中将简单总结阅读深度学习代码的经验并以MSHTrans为例子来进行阅读。 深度学习代码常见文件及代码架构在进入github仓库后，我们常见到多个文件，哪个文件重要、哪个文件不重要、首先阅读哪个文件、哪个文件只是简单的配置文件。初学者正是因为这些问题没有搞清楚，所以在开始学习的时候常常抓瞎，进而影响学习效率。MSHTrans仓库是一个很好的例子，因为MSHTrans的代码内只包括最基本、最重要的文件。  README.md: 项目的说明文件，类似说明书，打开仓库时最先看到的文件，也是最先阅读的文件。里面包括了代码的作用、文献、使用方式。 requirements.txt: 模型使用环境内的包，使用”pip install -r requirements.txt”安装依赖包 main.py: 启动模型的代码，该代码一般名称为”main.py”，当然也有其他名称，例如”go.py”。 common, experimental_results, networks, scripts: 剩余文件夹主要为模型相...</div></div></div></a><a class="pagination-related" href="/2025/12/15/MSHTrans/" title="MSHTrans文献速递(KDD, 2025)"><img class="cover" src="/img/deeplearning_pic.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-12-15</div><div class="info-item-2">MSHTrans文献速递(KDD, 2025)</div></div><div class="info-2"><div class="info-item-1">MSHTrans: 带有时间序列分解的多尺度超图Transformer实现时间异常检测。 Abstract目前已有的异常检测方法在理解重构模型的机理过程中存在2个主要挑战：1. 对于时间标签的长期和短期依赖性的挖掘不足；2. 同时挖掘长期与短期特征的框架缺失。为了解决这个问题，作者提出了MSHTrans，其充分使用了超图建模多阶时间依赖关系方面的能力。作者的模型使用了多尺度下采样来获取互为补充的细粒度和粗粒度表示，并与可训练的超图神经网络结合，该网络可以自适应地学习时间标签之间的关联性。这个框架进一步结合了时间序列分解来从多粒度特征中系统地提取周期性与趋势性成分。 Introduction时间序列异常检测是真实世界领域中的一个基础工作，尤其是在工业、医疗和金融领域，该领域主要有3大问题：1. 大规模数据；2. 异质性；3. 多模态特征。为了解决这3大问题，目前已有的模型可以被简单分为2类：基于预测的方法：该方法采用历史数据预测未来数据并根据预测误差来定量评估异常，但是这个方法对于时间特征快速改变的情形并不适用；基于重构的方法在近年获得重视，其通过从学习到的潜在表示重构数据并与真实...</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/my_icon.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Henry</div><div class="author-info-description">至此鲜花赠自己，纵马踏花向自由</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">45</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">15</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">6</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/evanescence0515"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/evanescence0515" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:evanescence0515@gmail.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">你好呀，这里是Evanescence的博客，  我会经常分享一些学习统计学、生物信息学、机器学习和计算机技术的心得和笔记。</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%83%8C%E6%99%AF"><span class="toc-number">1.</span> <span class="toc-text">背景</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#MIRA-%E6%A6%82%E8%BF%B0"><span class="toc-number">2.</span> <span class="toc-text">MIRA 概述</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%82%A3%E8%80%85%E6%99%BA%E8%83%BD%E4%BD%93%E7%9A%84%E9%B2%81%E6%A3%92%E6%80%A7%E4%B8%8E%E4%B8%80%E8%87%B4%E6%80%A7"><span class="toc-number">3.</span> <span class="toc-text">患者智能体的鲁棒性与一致性</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#MIRA-%E7%9A%84%E6%95%88%E6%9E%9C"><span class="toc-number">4.</span> <span class="toc-text">MIRA 的效果</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A8%A1%E6%8B%9F%E5%8C%BB%E7%94%9F%E5%B7%A5%E4%BD%9C%E6%B5%81"><span class="toc-number">4.1.</span> <span class="toc-text">模拟医生工作流</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8E%A8%E8%8D%90%E6%AD%A3%E7%A1%AE%E5%B9%B2%E9%A2%84%E6%89%8B%E6%AE%B5"><span class="toc-number">4.2.</span> <span class="toc-text">推荐正确干预手段</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#MIRA-Pipeline"><span class="toc-number">5.</span> <span class="toc-text">MIRA Pipeline</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%B0%8F%E7%BB%93"><span class="toc-number">6.</span> <span class="toc-text">小结</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2026/06/27/MIRA/" title="MIRA"><img src="/img/deeplearning_pic.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="MIRA"/></a><div class="content"><a class="title" href="/2026/06/27/MIRA/" title="MIRA">MIRA</a><time datetime="2026-06-27T05:12:18.000Z" title="发表于 2026-06-27 13:12:18">2026-06-27</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/04/27/ModernNCA/" title="ModernNCA(ICLR, 2025)"><img src="/img/deeplearning_pic.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="ModernNCA(ICLR, 2025)"/></a><div class="content"><a class="title" href="/2026/04/27/ModernNCA/" title="ModernNCA(ICLR, 2025)">ModernNCA(ICLR, 2025)</a><time datetime="2026-04-27T06:16:47.000Z" title="发表于 2026-04-27 14:16:47">2026-04-27</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/03/01/TimeXer%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/" title="TimeXer代码阅读"><img src="/img/deeplearning_pic.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="TimeXer代码阅读"/></a><div class="content"><a class="title" href="/2026/03/01/TimeXer%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/" title="TimeXer代码阅读">TimeXer代码阅读</a><time datetime="2026-03-01T14:30:00.000Z" title="发表于 2026-03-01 22:30:00">2026-03-01</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/02/27/TimeXer/" title="TimeXer(NeurIPS, 2024)"><img src="/img/deeplearning_pic.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="TimeXer(NeurIPS, 2024)"/></a><div class="content"><a class="title" href="/2026/02/27/TimeXer/" title="TimeXer(NeurIPS, 2024)">TimeXer(NeurIPS, 2024)</a><time datetime="2026-02-27T11:52:59.000Z" title="发表于 2026-02-27 19:52:59">2026-02-27</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/02/26/TimeMixer/" title="TimeMixer(ICLR, 2024)"><img src="/img/deeplearning_pic.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="TimeMixer(ICLR, 2024)"/></a><div class="content"><a class="title" href="/2026/02/26/TimeMixer/" title="TimeMixer(ICLR, 2024)">TimeMixer(ICLR, 2024)</a><time datetime="2026-02-25T16:29:27.000Z" title="发表于 2026-02-26 00:29:27">2026-02-26</time></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;2019 - 2026 By Henry</span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"><script>(() => {
+  const loadMathjax = () => {
+    if (!window.MathJax) {
+      window.MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']],
+          tags: 'none',
+        },
+        chtml: {
+          scale: 1.1
+        },
+        options: {
+          enableMenu: true,
+          renderActions: {
+            findScript: [10, doc => {
+              for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+                const display = !!node.type.match(/; *mode=display/)
+                const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display)
+                const text = document.createTextNode('')
+                node.parentNode.replaceChild(text, node)
+                math.start = {node: text, delim: '', n: 0}
+                math.end = {node: text, delim: '', n: 0}
+                doc.math.push(math)
+              }
+            }, '']
+          }
+        }
+      }
+
+      const script = document.createElement('script')
+      script.src = 'https://cdn.jsdelivr.net/npm/mathjax/es5/tex-mml-chtml.min.js'
+      script.id = 'MathJax-script'
+      script.async = true
+      document.head.appendChild(script)
+    } else {
+      MathJax.startup.document.state(0)
+      MathJax.texReset()
+      MathJax.typesetPromise()
+    }
+  }
+
+  btf.addGlobalFn('encrypt', loadMathjax, 'mathjax')
+  window.pjax ? loadMathjax() : window.addEventListener('load', loadMathjax)
+})()</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索内容..." type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div></body></html>
